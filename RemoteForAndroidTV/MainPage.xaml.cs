@@ -1,24 +1,22 @@
-﻿namespace RemoteForAndroidTV;
+﻿using Microsoft.Maui.Controls;
 
-public partial class MainPage : ContentPage
+namespace RemoteForAndroidTV
 {
-	int count = 0;
+    public partial class MainPage : ContentPage
+    {
+        public MainPage()
+        {
+            InitializeComponent();
+        }
 
-	public MainPage()
-	{
-		InitializeComponent();
-	}
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
 
-	private void OnCounterClicked(object sender, EventArgs e)
-	{
-		count++;
+            // Automatically navigate to DiscoveryPage when MainPage appears
+            await Navigation.PushAsync(new DiscoveryDevicesPage());
+            // await Navigation.PushAsync(new MainRemote("10.100.102.7"));
+        }
 
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
-
-		SemanticScreenReader.Announce(CounterBtn.Text);
-	}
+    }
 }
-

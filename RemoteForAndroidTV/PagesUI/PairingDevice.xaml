@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RemoteForAndroidTV.PairingDevicePage">
+
+    <StackLayout Padding="10">
+        <Label x:Name="DeviceNameLabel" FontSize="Large" />
+        <Label x:Name="DeviceIPLabel" FontSize="Medium" />
+        <Button Text="PAIR NOW" Clicked="OnStartPairing" />
+        <Entry x:Name="InputEntry" Placeholder="Enter code" FontSize="Medium" />
+        <Button Text="Enter Code" Clicked="OnEnterCode" />
+    </StackLayout>
+</ContentPage>

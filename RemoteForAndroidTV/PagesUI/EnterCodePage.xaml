@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RemoteForAndroidTV.EnterCodePage"
+             Background="Transparent">
+    <ContentPage.Resources>
+        <Style x:Key="LineEntryStyle" TargetType="Entry">
+            <Setter Property="FontSize" Value="40" />
+            <Setter Property="TextColor" Value="#D8BFD8" /> <!-- Light purple -->
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="VerticalOptions" Value="CenterAndExpand" />
+            <Setter Property="WidthRequest" Value="50" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Gradient Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="Black" Offset="0.0" />
+                <GradientStop Color="Purple" Offset="1.0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Content in the top -->
+        <StackLayout VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Padding="30,0" Spacing="10">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="10">
+                <StackLayout>
+                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry1" />
+                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
+                </StackLayout>
+
+                <StackLayout>
+                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry2" />
+                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
+                </StackLayout>
+
+                <StackLayout>
+                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry3" />
+                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
+                </StackLayout>
+
+                <StackLayout>
+                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry4" />
+                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
+                </StackLayout>
+
+                <StackLayout>
+                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry5" />
+                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
+                </StackLayout>
+
+                <StackLayout>
+                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry6" />
+                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
+                </StackLayout>
+            </StackLayout>
+
+            <Button Text="OK" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnOkButtonClicked"/>
+        </StackLayout>
+    </Grid>
+</ContentPage>

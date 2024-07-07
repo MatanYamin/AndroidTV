@@ -8,58 +8,43 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using Microsoft.Maui.Controls;
 using System.Net.Sockets;
-using System.Diagnostics;
-using System.Text;
-using System.Reflection;
 
 public class Pairing
 {
-    private static SslStream sslStream = default!;
-    private static TcpClient client = default!;
+    private static SslStream? sslStream = default!;
+    private static TcpClient? client = default!;
     const int PAIRING_PORT = 6467;
-    IValues PLATFORM_VALUES;
 
     private readonly string SERVER_IP;
 
     public Pairing(string ip){
-        AssignPlatformValues();
         this.SERVER_IP = ip;
-    }
-
-        private void AssignPlatformValues(){
-
-        #if ANDROID
-        PLATFORM_VALUES = new AndroidValues();
-        #elif IOS
-        PLATFORM_VALUES = new iOSValues();
-        #endif
     }
 
     public async Task StartPairing()
     {
-    try
-    {
-        await Task.Run(async () =>
+
+        CloseConnection();
+
+        try
         {
-            // Fetch the server certificate
-            await FetchServerCertificate(SERVER_IP, 6467);
-            // Generate the client certificate
-            GenerateClientCertificate();
-            // Connect to the server
-            await ConnectToServer();
-        });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"An error occurred: {ex.Message}");
-        if (ex.InnerException != null)
+            await Task.Run(async () =>
+            {
+                // Fetch the server certificate
+                await FetchServerCertificate(this.SERVER_IP, PAIRING_PORT);
+                // Generate the client certificate
+                Pairing.GenerateClientCertificate();
+                // Connect to the server
+                await ConnectToServer();
+            });
+        }
+        catch (Exception)
         {
-            Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            CloseConnection();
         }
     }
-}
 
-    public async Task<string> FetchServerCertificate(string serverIp, int port)
+    public async Task<string?> FetchServerCertificate(string serverIp, int port)
         {
             string serverUrl = $"https://{serverIp}:{port}";
 
@@ -69,10 +54,8 @@ public class Pairing
 
                 if (certificate != null)
                 {
-
-                    // Convert the certificate to PEM format
                     var cert = new X509Certificate2(certificate);
-                    string pemCert = ExportToPem(cert);
+                    string pemCert = Pairing.ExportToPem(cert);
                     SharedPref.SaveServerCertificate(pemCert);
 
                     // Return false to stop further processing since we only want the certificate
@@ -104,7 +87,7 @@ public class Pairing
             return "Certificate retrieved and saved.";
         }
 
-    private string ExportToPem(X509Certificate2 cert)
+    private static string ExportToPem(X509Certificate2 cert)
     {
         string pemCert = "-----BEGIN CERTIFICATE-----\n"
                         + Convert.ToBase64String(cert.Export(X509ContentType.Cert), Base64FormattingOptions.InsertLineBreaks)
@@ -112,7 +95,7 @@ public class Pairing
         return pemCert;
     }
 
-    private void GenerateClientCertificate()
+    private static void GenerateClientCertificate()
     {
         // Distinguished Name details
         var distinguishedName = new X500DistinguishedName("CN=atvremote, C=US, ST=California, L=Mountain View, O=Google Inc., OU=Android, E=example@google.com");
@@ -131,130 +114,119 @@ public class Pairing
         }
     }
 
-    private void CloseConnection()
+    private static void CloseConnection()
     {
-    try
-    {
-        if (sslStream != null)
+        try
         {
-            sslStream.Close();
-            sslStream.Dispose();
-            sslStream = null;
-        }
+            if (sslStream != null)
+            {
+                sslStream.Close();
+                sslStream.Dispose();
+                sslStream = null;
+            }
 
-        if (client != null)
+            if (client != null)
+            {
+                client.Close();
+                client.Dispose();
+                client = null;
+            }
+
+            Console.WriteLine("Connection closed successfully.");
+        }
+        catch (Exception ex)
         {
-            client.Close();
-            client.Dispose();
-            client = null;
+            Console.WriteLine($"An error occurred while closing the connection: {ex.Message}");
         }
-
-        Console.WriteLine("Connection closed successfully.");
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"An error occurred while closing the connection: {ex.Message}");
-    }
-}
 
     private async Task ConnectToServer()
     {
-            try
+        try
+        {
+            byte[]? certificateContent = SharedPref.LoadClientCertificate();
+
+            // Load client certificate
+            X509Certificate2 clientCertificate = new(certificateContent);
+
+            // Load client certificate
+            // Establish a TCP connection
+            using (client = new TcpClient())
             {
-                // string clientCertPath = Path.Combine(PLATFORM_VALUES.DocsPath(), "client.pem");
-                
-                byte[] certificateContent = SharedPref.LoadClientCertificate();
+                await client.ConnectAsync(SERVER_IP, PAIRING_PORT);
+                Console.WriteLine("Successfully connected to the server.");
 
-                // Load client certificate
-                X509Certificate2 clientCertificate = new X509Certificate2(certificateContent);
-
-                // Load client certificate
-                // Establish a TCP connection
-                using (client = new TcpClient())
+                // Create SSL stream
+                using (sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate)))
                 {
-                    await client.ConnectAsync(SERVER_IP, PAIRING_PORT);
-                    Console.WriteLine("Successfully connected to the server.");
 
-                    // Create SSL stream
-                    using (sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate)))
+                    // Authenticate the server and send the client certificate
+                    await sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509CertificateCollection() { clientCertificate }, false);
+                    Console.WriteLine("Successfully AuthenticateAsClientAsync to the server.");
+
+                    // Send the first set of messages
+                    await SendServerMessage(Values.Connection.firstPayloadMessage);
+
+                    // Send the next set of messages based on the server response
+                    await SendServerMessage(Values.Connection.secondPayloadMessage);
+
+                    // Send the last set of messages
+                    await SendServerMessage(Values.Connection.thirdPayloadMessage);
+
+                    // Start reading data from the server
+                    byte[] buffer = new byte[4096];
+                    while (true)
                     {
-
-                        // Authenticate the server and send the client certificate
-                        await sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509CertificateCollection() { clientCertificate }, false);
-                        Console.WriteLine("Successfully AuthenticateAsClientAsync to the server.");
-
-                        // Send the first set of messages
-                        await SendServerMessage(Values.Connection.firstPayloadMessage);
-
-                        // Send the next set of messages based on the server response
-                        await SendServerMessage(Values.Connection.secondPayloadMessage);
-
-                        // Send the last set of messages
-                        await SendServerMessage(Values.Connection.thirdPayloadMessage);
-
-                        // Start reading data from the server
-                        byte[] buffer = new byte[4096];
-                        while (true)
+                        int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length);
+                        if (bytesRead > 0)
                         {
-                            int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length);
-                            if (bytesRead > 0)
-                            {
-                                // Handle the received bytes according to the expected format
-                                byte[] responseData = new byte[bytesRead];
-                                Array.Copy(buffer, responseData, bytesRead);
-                                // Process responseData as needed
-                            }
-
+                            // Handle the received bytes according to the expected format
+                            byte[] responseData = new byte[bytesRead];
+                            Array.Copy(buffer, responseData, bytesRead);
+                            // Process responseData as needed
                         }
+
                     }
                 }
             }
-            catch (IOException ex)
-            {
-                Console.WriteLine("Disconnected from the server: " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-
-                // Check if there's an inner exception
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                }
-            }
-    }
-
-   private static async Task SendServerMessage(byte[] message)
-{
-    try
-    {
-        byte[] messageLengthArray = { (byte)message.Length };
-
-        // Send the message length
-        await sslStream.WriteAsync(messageLengthArray, 0, messageLengthArray.Length);
-        await Task.Delay(100); // Optional delay to ensure message length is processed separately
-
-        // Send the actual message
-        await sslStream.WriteAsync(message, 0, message.Length);
-        await sslStream.FlushAsync();
-
-        // Wait for the server response
-        byte[] buffer = new byte[4096];
-        int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length);
-        if (bytesRead > 0)
-        {
-            string response = System.Text.Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            Console.WriteLine($"Received {bytesRead} bytes from server: {response}");
-            // Process the server response
         }
+        catch (IOException ex)
+        {
+            Console.WriteLine("Disconnected from the server: " + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
 
+            // Check if there's an inner exception
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+        }
     }
-    catch (Exception ex)
+
+    private static async Task SendServerMessage(byte[] message)
     {
-        Console.WriteLine($"Exception in SendServerMessage: {ex.Message}");
+        try
+        {
+            byte[] messageLengthArray = [(byte)message.Length];
+
+            // Send the message length
+            await sslStream.WriteAsync(messageLengthArray, 0, messageLengthArray.Length);
+            await Task.Delay(100); // Optional delay to ensure message length is processed separately
+
+            // Send the actual message
+            await sslStream.WriteAsync(message, 0, message.Length);
+            await sslStream.FlushAsync();
+
+        }
+        catch (Exception ex)
+        {
+            CloseConnection();
+            Console.WriteLine($"Exception in SendServerMessage: {ex.Message}");
+        }
     }
-}
     
     private static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
     {
@@ -293,8 +265,6 @@ public class Pairing
         // nonce are the last 4 characters of the code displayed on the TV
         byte[] nonce = FromHexString(code.Substring(2)).ToArray();
 
-        // string documentsPath = PLATFORM_VALUES.DocsPath();
-        // string clientCertPath = Path.Combine(documentsPath, "client.pem");
         X509Certificate2 clientCertificate = new X509Certificate2(SharedPref.LoadClientCertificate());
      
         string pemCert = SharedPref.LoadServerCertificate();
@@ -333,6 +303,5 @@ public class Pairing
             #endif
 
         }
-
 
 }

@@ -42,14 +42,14 @@ namespace RemoteForAndroidTV
         {
             if (e.Item != null && e.Item is DeviceInfo deviceInfo)
             {
-                await Navigation.PushAsync(new PairingDevicePage(deviceInfo));
+                await Navigation.PushAsync(new EnterCodePage(deviceInfo));
             }
         }
     }
 
     public class DeviceInfo
     {
-        public string Name { get; set; }
-        public string IP { get; set; }
+        public required string Name { get; set; }
+        public required string IP { get; set; }
     }
 }

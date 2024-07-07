@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<key>CFBundleIdentifier</key>
+	<string>com.myapps.remoteforandroidtv</string>
+	<key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIDeviceFamily</key>
@@ -28,5 +35,11 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSBonjourServices</key>
+<array>
+    <string>_androidtvremote2._tcp.</string>
+</array>
+<key>NSLocalNetworkUsageDescription</key>
+<string>We need access to the local network to discover devices.</string>
 </dict>
 </plist>

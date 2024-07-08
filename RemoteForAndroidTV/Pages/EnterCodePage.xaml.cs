@@ -8,10 +8,12 @@ namespace RemoteForAndroidTV
     {
         Pairing _pairing;
         string ip;
+        MainRemote _remote;
         public EnterCodePage(DeviceInfo deviceInfo)
         {
             InitializeComponent();
-            
+
+            SubscribeEvents();   
             _pairing = new Pairing(deviceInfo.IP);
             this.ip = deviceInfo.IP;
              Task.Run(() => _pairing.StartPairing());
@@ -76,9 +78,41 @@ namespace RemoteForAndroidTV
 
             await _pairing.ConnectWithCode(enteredCode);
 
-            await Task.Delay(1500);
+            _remote = new MainRemote(ip);
 
-            await Navigation.PushAsync(new MainRemote(ip));
         }
+
+        public async void ConnectionSuccess(object sender, EventArgs e){
+            UnSubscribeEvents();
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Navigation.PushAsync(_remote);
+            });
+        } 
+
+        public async void ConnectionLost(object sender, EventArgs e)
+        {
+            UnSubscribeEvents();
+
+            // Ensure navigation happens on the main thread
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Navigation.PopAsync();
+            });
+        }     
+
+        void SubscribeEvents(){
+
+            RemoteConnection.ConnectionSuccessEvent += ConnectionSuccess;
+            RemoteConnection.ConnectionLostEvent += ConnectionLost;
+        }
+
+        void UnSubscribeEvents(){
+
+            RemoteConnection.ConnectionSuccessEvent -= ConnectionSuccess;
+            RemoteConnection.ConnectionLostEvent -= ConnectionLost;
+
+        }
+
     }
 }

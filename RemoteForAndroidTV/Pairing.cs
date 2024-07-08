@@ -6,7 +6,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
-using Microsoft.Maui.Controls;
 using System.Net.Sockets;
 
 public class Pairing
@@ -165,13 +164,13 @@ public class Pairing
                     Console.WriteLine("Successfully AuthenticateAsClientAsync to the server.");
 
                     // Send the first set of messages
-                    await SendServerMessage(Values.Connection.firstPayloadMessage);
+                    await SendServerMessage(Values.Pairing.firstPayloadMessage);
 
                     // Send the next set of messages based on the server response
-                    await SendServerMessage(Values.Connection.secondPayloadMessage);
+                    await SendServerMessage(Values.Pairing.secondPayloadMessage);
 
                     // Send the last set of messages
-                    await SendServerMessage(Values.Connection.thirdPayloadMessage);
+                    await SendServerMessage(Values.Pairing.thirdPayloadMessage);
 
                     // Start reading data from the server
                     byte[] buffer = new byte[4096];
@@ -192,6 +191,7 @@ public class Pairing
         }
         catch (IOException ex)
         {
+
             Console.WriteLine("Disconnected from the server: " + ex.Message);
         }
         catch (Exception ex)

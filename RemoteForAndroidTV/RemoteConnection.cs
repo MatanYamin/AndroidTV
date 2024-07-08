@@ -67,7 +67,7 @@ public class RemoteConnection{
             // Read the server response
             await ReadServerMessage();
 
-            await SendServerMessage(Values.RemoteConnect.secondPayload);
+            await SendServerMessage(Values.RemoteConnect.SecondPayload);
 
             // server should respond with 3 messages
             for (int i = 0; i < 3; i++)
@@ -273,7 +273,6 @@ public class RemoteConnection{
                 {
                     // Convert the response to a string and print it
                     string response = System.Text.Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine($"Received {bytesRead} bytes from server: {response}");
 
                     // Check if the response is a ping packet
                     if (buffer[0] == 66 && buffer[1] == 6)
@@ -282,7 +281,6 @@ public class RemoteConnection{
                         byte[] pongResponse = [74, 2, 8, 25];
                         await sslStream.WriteAsync(pongResponse, 0, pongResponse.Length, cancellationToken);
                         await sslStream.FlushAsync(cancellationToken);
-                        Console.WriteLine("Sent pong response to server.");
                     }
                 }
             }
@@ -294,7 +292,6 @@ public class RemoteConnection{
         }
 
         private static void NotifyConnectionLost(){
-            Console.WriteLine("connectino lost");
             ConnectionLostEvent?.Invoke(null, EventArgs.Empty);
         }
 

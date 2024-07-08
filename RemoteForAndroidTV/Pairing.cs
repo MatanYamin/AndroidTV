@@ -13,18 +13,18 @@ public class Pairing
     private static SslStream? sslStream = default!;
     private static TcpClient? client = default!;
     const int PAIRING_PORT = 6467;
-
+    EnterCodePage _codePage;
     private readonly string SERVER_IP;
 
-    public Pairing(string ip){
+    public Pairing(string ip, EnterCodePage ecp){
         this.SERVER_IP = ip;
+        _codePage = ecp;
     }
 
     public async Task StartPairing()
     {
 
         CloseConnection();
-
         try
         {
             await Task.Run(async () =>
@@ -32,7 +32,7 @@ public class Pairing
                 // Fetch the server certificate
                 await FetchServerCertificate(this.SERVER_IP, PAIRING_PORT);
                 // Generate the client certificate
-                Pairing.GenerateClientCertificate();
+                GenerateClientCertificate();
                 // Connect to the server
                 await ConnectToServer();
             });
@@ -40,7 +40,12 @@ public class Pairing
         catch (Exception)
         {
             CloseConnection();
+            NotifyConnectionFailed();
         }
+    }
+
+    void NotifyConnectionFailed(){
+        _codePage.ConnectionLost(null, EventArgs.Empty);
     }
 
     public async Task<string?> FetchServerCertificate(string serverIp, int port)
@@ -145,6 +150,10 @@ public class Pairing
         {
             byte[]? certificateContent = SharedPref.LoadClientCertificate();
 
+            if (certificateContent == null)
+            {
+                throw new InvalidOperationException("Client certificate content is null.");
+            }
             // Load client certificate
             X509Certificate2 clientCertificate = new(certificateContent);
 
@@ -164,14 +173,16 @@ public class Pairing
                     Console.WriteLine("Successfully AuthenticateAsClientAsync to the server.");
 
                     // Send the first set of messages
-                    await SendServerMessage(Values.Pairing.firstPayloadMessage);
+                    await SendServerMessage(Values.Pairing.FirstPayloadMessage);
+                    await ReadServerMessage();
 
                     // Send the next set of messages based on the server response
-                    await SendServerMessage(Values.Pairing.secondPayloadMessage);
+                    await SendServerMessage(Values.Pairing.SecondPayloadMessage);
+                    await ReadServerMessage();
 
                     // Send the last set of messages
-                    await SendServerMessage(Values.Pairing.thirdPayloadMessage);
-
+                    await SendServerMessage(Values.Pairing.ThirdPayloadMessage);
+                    await ReadServerMessage();
                     // Start reading data from the server
                     byte[] buffer = new byte[4096];
                     while (true)
@@ -189,6 +200,7 @@ public class Pairing
                 }
             }
         }
+        
         catch (IOException ex)
         {
 
@@ -303,5 +315,30 @@ public class Pairing
             #endif
 
         }
+
+        private async Task<byte[]?> ReadServerMessage()
+    {
+        try
+        {
+            byte[] buffer = new byte[4096];
+            int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length);
+
+            if (bytesRead > 0)
+            {
+                byte[] responseData = new byte[bytesRead];
+                Array.Copy(buffer, responseData, bytesRead);
+                return responseData;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception in ReadServerMessage: {ex.Message}");
+            return null;
+        }
+    }
 
 }

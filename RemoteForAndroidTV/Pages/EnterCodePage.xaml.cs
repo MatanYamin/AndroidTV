@@ -13,8 +13,8 @@ namespace RemoteForAndroidTV
         {
             InitializeComponent();
 
-            SubscribeEvents();   
-            _pairing = new Pairing(deviceInfo.IP);
+            SubscribeEvents();
+            _pairing = new Pairing(deviceInfo.IP, this);
             this.ip = deviceInfo.IP;
              Task.Run(() => _pairing.StartPairing());
         }

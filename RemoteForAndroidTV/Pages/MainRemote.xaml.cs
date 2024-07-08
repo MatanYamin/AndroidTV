@@ -13,6 +13,11 @@ public partial class MainRemote : ContentPage{
 
     }
 
+    public async Task InitializeAsync()
+    {
+        await _commands.InitializeAsync();
+    }
+
     private async void OnBTN1(object sender, EventArgs e)
     {
         await _commands.TestChannelUpCommand();

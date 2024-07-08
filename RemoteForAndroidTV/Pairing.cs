@@ -13,7 +13,7 @@ public class Pairing
     private static SslStream? sslStream = default!;
     private static TcpClient? client = default!;
     const int PAIRING_PORT = 6467;
-    EnterCodePage _codePage;
+    EnterCodePage _codePage = default!;
     private readonly string SERVER_IP;
 
     public Pairing(string ip, EnterCodePage ecp){
@@ -25,6 +25,7 @@ public class Pairing
     {
 
         CloseConnection();
+
         try
         {
             await Task.Run(async () =>
@@ -59,7 +60,7 @@ public class Pairing
                 if (certificate != null)
                 {
                     var cert = new X509Certificate2(certificate);
-                    string pemCert = Pairing.ExportToPem(cert);
+                    string pemCert = ExportToPem(cert);
                     SharedPref.SaveServerCertificate(pemCert);
 
                     // Return false to stop further processing since we only want the certificate
@@ -73,8 +74,8 @@ public class Pairing
             using var client = new HttpClient(handler);
             try
             {
-                Console.WriteLine($"Making request to {serverUrl}...");
-                var response = await client.GetAsync(serverUrl);
+                // Console.WriteLine($"Making request to {serverUrl}...");
+                // var response = await client.GetAsync(serverUrl);
                 // No need to process the response since our goal is to fetch the certificate
             }
             catch (HttpRequestException e)
@@ -148,6 +149,7 @@ public class Pairing
     {
         try
         {
+
             byte[]? certificateContent = SharedPref.LoadClientCertificate();
 
             if (certificateContent == null)
@@ -157,63 +159,55 @@ public class Pairing
             // Load client certificate
             X509Certificate2 clientCertificate = new(certificateContent);
 
-            // Load client certificate
             // Establish a TCP connection
-            using (client = new TcpClient())
-            {
-                await client.ConnectAsync(SERVER_IP, PAIRING_PORT);
-                Console.WriteLine("Successfully connected to the server.");
+            client = new TcpClient();
+            await client.ConnectAsync(SERVER_IP, PAIRING_PORT);
+            Console.WriteLine("Successfully connected to the server.");
 
-                // Create SSL stream
-                using (sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate)))
-                {
+            // Create SSL stream
+            sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate));
 
-                    // Authenticate the server and send the client certificate
-                    await sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509CertificateCollection() { clientCertificate }, false);
-                    Console.WriteLine("Successfully AuthenticateAsClientAsync to the server.");
+            // Authenticate the server and send the client certificate
+            await sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509CertificateCollection() { clientCertificate }, false);
+            Console.WriteLine("Successfully AuthenticateAsClientAsync to the server.");
 
-                    // Send the first set of messages
-                    await SendServerMessage(Values.Pairing.FirstPayloadMessage);
-                    await ReadServerMessage();
+            // Send the first set of messages
+            await SendServerMessage(Values.Pairing.FirstPayloadMessage);
+            await ReadServerMessage();
 
-                    // Send the next set of messages based on the server response
-                    await SendServerMessage(Values.Pairing.SecondPayloadMessage);
-                    await ReadServerMessage();
+            // Send the next set of messages based on the server response
+            await SendServerMessage(Values.Pairing.SecondPayloadMessage);
+            await ReadServerMessage();
 
-                    // Send the last set of messages
-                    await SendServerMessage(Values.Pairing.ThirdPayloadMessage);
-                    await ReadServerMessage();
-                    // Start reading data from the server
-                    byte[] buffer = new byte[4096];
-                    while (true)
-                    {
-                        int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length);
-                        if (bytesRead > 0)
-                        {
-                            // Handle the received bytes according to the expected format
-                            byte[] responseData = new byte[bytesRead];
-                            Array.Copy(buffer, responseData, bytesRead);
-                            // Process responseData as needed
-                        }
-
-                    }
-                }
-            }
+            // Send the last set of messages
+            await SendServerMessage(Values.Pairing.ThirdPayloadMessage);
+            await ReadServerMessage();
+         
         }
-        
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Read operation was canceled.");
+        }
         catch (IOException ex)
         {
-
             Console.WriteLine("Disconnected from the server: " + ex.Message);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
-
-            // Check if there's an inner exception
-            if (ex.InnerException != null)
+            // Ignore OperationCanceledException to prevent the message "The operation was canceled"
+            if (ex is OperationCanceledException)
             {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                Console.WriteLine("Read operation was canceled.");
+            }
+            else
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+
+                // Check if there's an inner exception
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
             }
         }
     }
@@ -246,19 +240,38 @@ public class Pairing
         return true; // For now, we accept any server certificate
     }
 
-    public async Task ConnectWithCode(string tvCode){
 
-        byte[] encodedSecret = EncryptSecret(tvCode);
+    public async Task ConnectWithCode(string tvCode)
+    {
+        try
+        {
+            byte[] encodedSecret = await EncryptSecretAsync(tvCode);
 
-        byte[] encodedSecretNew = [8, 2, 16, 200, 1, 194, 2, 34, 10, 32];
+            byte[] encodedSecretNew = new byte[] { 8, 2, 16, 200, 1, 194, 2, 34, 10, 32 };
+            byte[] concatenatedArray = encodedSecretNew.Concat(encodedSecret).ToArray();
 
-        byte[] concatenatedArray = encodedSecretNew.Concat(encodedSecret).ToArray();
-
-        await SendServerMessage(concatenatedArray);
-
-        CloseConnection();
-
+            await SendServerMessage(concatenatedArray);
+            CloseConnection();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception in ConnectWithCode: {ex.Message}");
+        }
     }
+
+    // public async Task ConnectWithCode(string tvCode){
+
+    //     byte[] encodedSecret = EncryptSecret(tvCode);
+
+    //     byte[] encodedSecretNew = [8, 2, 16, 200, 1, 194, 2, 34, 10, 32];
+
+    //     byte[] concatenatedArray = encodedSecretNew.Concat(encodedSecret).ToArray();
+
+    //     await SendServerMessage(concatenatedArray);
+
+    //     CloseConnection();
+
+    // }
 
       private X509Certificate2 LoadCertificateFromPem(string pem)
         {
@@ -271,17 +284,22 @@ public class Pairing
 
             byte[] certBytes = Convert.FromBase64String(base64Cert);
             return new X509Certificate2(certBytes);
+  
         }
-    private byte[] EncryptSecret(string code)
+
+
+    private async Task<byte[]> EncryptSecretAsync(string code)
+{
+    return await Task.Run(() =>
     {
         // nonce are the last 4 characters of the code displayed on the TV
         byte[] nonce = FromHexString(code.Substring(2)).ToArray();
 
         X509Certificate2 clientCertificate = new X509Certificate2(SharedPref.LoadClientCertificate());
-     
         string pemCert = SharedPref.LoadServerCertificate();
         X509Certificate2 serverCertificate = LoadCertificateFromPem(pemCert);
-            // Extract the RSA public key from the loaded certificate
+
+        // Extract the RSA public key from the loaded certificate
         var clientRSAPublicKey = clientCertificate.GetRSAPublicKey().ExportParameters(false);
         var serverRSAPublicKey = serverCertificate.GetRSAPublicKey().ExportParameters(false);
 
@@ -298,8 +316,37 @@ public class Pairing
         {
             return sha256.ComputeHash(inputBytes);
         }
+    });
+}
 
-    }
+    // private byte[] EncryptSecret(string code)
+    // {
+    //     // nonce are the last 4 characters of the code displayed on the TV
+    //     byte[] nonce = FromHexString(code.Substring(2)).ToArray();
+
+    //     X509Certificate2 clientCertificate = new X509Certificate2(SharedPref.LoadClientCertificate());
+     
+    //     string pemCert = SharedPref.LoadServerCertificate();
+    //     X509Certificate2 serverCertificate = LoadCertificateFromPem(pemCert);
+    //         // Extract the RSA public key from the loaded certificate
+    //     var clientRSAPublicKey = clientCertificate.GetRSAPublicKey().ExportParameters(false);
+    //     var serverRSAPublicKey = serverCertificate.GetRSAPublicKey().ExportParameters(false);
+
+    //     // Concatenate components with nonce
+    //     byte[] inputBytes = clientRSAPublicKey.Modulus
+    //                             .Concat(clientRSAPublicKey.Exponent)
+    //                             .Concat(serverRSAPublicKey.Modulus)
+    //                             .Concat(serverRSAPublicKey.Exponent)
+    //                             .Concat(nonce)
+    //                             .ToArray();
+
+    //     // Compute SHA-256 hash
+    //     using (SHA256 sha256 = SHA256.Create())
+    //     {
+    //         return sha256.ComputeHash(inputBytes);
+    //     }
+
+    // }
 
     private static byte[] FromHexString(string hex)
         {

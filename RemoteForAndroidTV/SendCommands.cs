@@ -12,12 +12,17 @@ public class SendCommands{
         _remoteConnect = new RemoteConnection(ip);
     }
 
+      public async Task InitializeAsync()
+    {
+        await _remoteConnect.InitializeConnectionAsync();
+    }
+
     public async Task TestChannelUpCommand()
     {
-        byte[] m1 = { 7 };
-        byte[] m1press = { 82, 5, 8, 166, 1, 16, 3 };
+        byte[] m1 = [7];
+        byte[] m1press = [82, 5, 8, 166, 1, 16, 3];
 
-        await _remoteConnect.SendRemoteButton(m1, m1press);
+        _remoteConnect.SendRemoteButton(m1, m1press);
     }
 
     public async Task TestVolumeCommand()
@@ -27,8 +32,8 @@ public class SendCommands{
         byte[] m2 = [6];
         byte[] m2press = [82, 4, 8, 8, 16, 2];
 
-        await _remoteConnect.SendRemoteButton(m1, m1press);
-        await _remoteConnect.SendRemoteButton(m2, m2press);
+        _remoteConnect.SendRemoteButton(m1, m1press);
+        _remoteConnect.SendRemoteButton(m2, m2press);
     }
 
 }

@@ -42,7 +42,6 @@ namespace RemoteForAndroidTV
                     entry.Text = newText;
                 }
             }
-
             if (entry.Text.Length == 1)
             {
                 FocusNextEntry(entry);
@@ -80,6 +79,7 @@ namespace RemoteForAndroidTV
 
             _remote = new MainRemote(ip);
 
+             await _remote.InitializeAsync();
         }
 
         public async void ConnectionSuccess(object sender, EventArgs e){

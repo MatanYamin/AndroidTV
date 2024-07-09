@@ -4,12 +4,13 @@ using Microsoft.Maui.Controls;
 
 public partial class MainRemote : ContentPage{
 
-    SendCommands _commands;
+    readonly SendCommands _commands;
 
+    // HERE THE EVENT
     public MainRemote(string ip){
 
         InitializeComponent();
-        _commands = new SendCommands(ip);
+        this._commands = new SendCommands(ip);
 
     }
 
@@ -18,15 +19,15 @@ public partial class MainRemote : ContentPage{
         await _commands.InitializeAsync();
     }
 
-    private async void OnBTN1(object sender, EventArgs e)
+    private void OnBTN1(object sender, EventArgs e)
     {
-        await _commands.TestChannelUpCommand();
+        _commands.TestChannelUpCommand();
 
     }
-    private async void OnBTN2(object sender, EventArgs e)
+    private void OnBTN2(object sender, EventArgs e)
     {
         // await _commands.test2();
-        await _commands.TestVolumeCommand();
+        _commands.TestVolumeCommand();
     }
 
 }

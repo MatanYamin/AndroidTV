@@ -7,6 +7,7 @@ namespace RemoteForAndroidTV
         public MainPage()
         {
             InitializeComponent();
+            
         }
 
         protected override async void OnAppearing()
@@ -15,6 +16,8 @@ namespace RemoteForAndroidTV
 
             // Automatically navigate to DiscoveryPage when MainPage appears
             await Navigation.PushAsync(new DiscoveryDevicesPage());
+
+
 
             // var _remote = new MainRemote("10.100.102.128");
             //  await MainThread.InvokeOnMainThreadAsync(async () =>

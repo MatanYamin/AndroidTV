@@ -1,13 +1,5 @@
 using System.Collections.ObjectModel;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Zeroconf;
-using Android;
-using Android.Content.PM;
-using AndroidX.Core.App;
-using AndroidX.Core.Content;
 
 namespace RemoteForAndroidTV
 {

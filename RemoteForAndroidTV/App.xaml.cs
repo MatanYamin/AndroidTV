@@ -2,10 +2,14 @@
 
 public partial class App : Application
 {
-	public App()
-	{
-		InitializeComponent();
+    public App()
+    {
+        InitializeComponent();
 
-		MainPage = new AppShell();
-	}
+        MainPage = new NavigationPage(new AppShell())
+        {
+            BarBackgroundColor = Colors.Red,
+            BarTextColor = Colors.White
+        };
+    }
 }

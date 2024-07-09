@@ -19,5 +19,8 @@ public static class Values
     public static class RemoteConnect{
         private static readonly byte[] _secondPayload = [18, 3, 8, 238, 4];
         public static byte[] SecondPayload => _secondPayload;
+
+        private static readonly byte[] _pong = [74, 2, 8, 25];
+        public static byte[] Pong => _pong;
     }
 }

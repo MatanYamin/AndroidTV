@@ -8,15 +8,21 @@ namespace RemoteForAndroidTV
     {
         Pairing _pairing;
         string ip;
-        MainRemote _remote;
+        MainRemote _remote = null;
         public EnterCodePage(DeviceInfo deviceInfo)
         {
+
             InitializeComponent();
 
             SubscribeEvents();
-            _pairing = new Pairing(deviceInfo.IP, this);
+
             this.ip = deviceInfo.IP;
-             Task.Run(() => _pairing.StartPairing());
+
+            _remote = new MainRemote(ip);
+
+            _pairing = new Pairing(deviceInfo.IP);
+            Task.Run(() => _pairing.StartPairing());
+
         }
 
         protected override void OnAppearing()
@@ -77,40 +83,42 @@ namespace RemoteForAndroidTV
 
             await _pairing.ConnectWithCode(enteredCode);
 
-            _remote = new MainRemote(ip);
-
-             await _remote.InitializeAsync();
+            await _remote.InitializeAsync();
         }
 
         public async void ConnectionSuccess(object sender, EventArgs e){
-            UnSubscribeEvents();
+            // UnSubscribeEvents();
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
+                
                 await Navigation.PushAsync(_remote);
             });
         } 
 
         public async void ConnectionLost(object sender, EventArgs e)
         {
-            UnSubscribeEvents();
-
             // Ensure navigation happens on the main thread
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
+                UnSubscribeEvents();
+                // await Navigation.PushAsync(new DiscoveryDevicesPage());
                 await Navigation.PopAsync();
             });
         }     
 
         void SubscribeEvents(){
 
+            UnSubscribeEvents();
             RemoteConnection.ConnectionSuccessEvent += ConnectionSuccess;
             RemoteConnection.ConnectionLostEvent += ConnectionLost;
+            Pairing.ConnectionLostEvent += ConnectionLost;
         }
 
         void UnSubscribeEvents(){
 
             RemoteConnection.ConnectionSuccessEvent -= ConnectionSuccess;
             RemoteConnection.ConnectionLostEvent -= ConnectionLost;
+            Pairing.ConnectionLostEvent -= ConnectionLost;
 
         }
 

@@ -5,11 +5,13 @@ using Microsoft.Maui.Controls;
 public class SendCommands{
 
     RemoteConnection _remoteConnect = default!;
+    string ServerIp;
 
     public SendCommands(string ip){
 
+        this.ServerIp = ip;
         // Creating a connection to the device
-        _remoteConnect = new RemoteConnection(ip);
+        _remoteConnect = new RemoteConnection(ip, this);
     }
 
       public async Task InitializeAsync()
@@ -17,23 +19,37 @@ public class SendCommands{
         await _remoteConnect.InitializeConnectionAsync();
     }
 
-    public async Task TestChannelUpCommand()
+    public void TestChannelUpCommand()
     {
-        byte[] m1 = [7];
         byte[] m1press = [82, 5, 8, 166, 1, 16, 3];
 
-        _remoteConnect.SendRemoteButton(m1, m1press);
+        _remoteConnect.SendRemoteButton(m1press);
     }
 
-    public async Task TestVolumeCommand()
+    public void TestVolumeCommand()
     {
-        byte[] m1 = [6];
         byte[] m1press = [82, 5, 8, 8, 16, 1];
-        byte[] m2 = [6];
         byte[] m2press = [82, 4, 8, 8, 16, 2];
 
-        _remoteConnect.SendRemoteButton(m1, m1press);
-        _remoteConnect.SendRemoteButton(m2, m2press);
+        _remoteConnect.SendRemoteButton(m1press);
+        _remoteConnect.SendRemoteButton(m2press);
+    }
+
+     public async Task ReinitializeConnectionAsync(byte[]? command)
+    {
+        // Ensure the current connection is properly closed and disposed
+        if (_remoteConnect != null)
+        {
+            _remoteConnect.Dispose();
+        }
+
+        // Create a new instance and initialize it
+        _remoteConnect = new RemoteConnection(ServerIp, this);
+        await _remoteConnect.InitializeConnectionAsync();
+
+        if(command != null){
+            _remoteConnect.SendRemoteButton(command);
+        }
     }
 
 }

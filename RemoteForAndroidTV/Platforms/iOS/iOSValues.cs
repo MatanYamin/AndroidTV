@@ -1,5 +1,7 @@
 namespace RemoteForAndroidTV;
-
+using SystemConfiguration;
+using CoreFoundation;
+using System.Net;
 
 public class iOSValues : IValues
 {
@@ -13,5 +15,12 @@ public class iOSValues : IValues
     {
         return "_androidtvremote2._tcp.";
     }
+
+    public bool IsConnectedToInternet()
+    {
+        var current = Connectivity.NetworkAccess;
+        return current == NetworkAccess.Internet;
+    }
+
 }
     

@@ -4,7 +4,7 @@ using Microsoft.Maui.Controls;
 
 public class SendCommands{
 
-    RemoteConnection _remoteConnect = default!;
+    RemoteConnection? _remoteConnect = default!;
     string ServerIp;
 
     public SendCommands(string ip){
@@ -59,11 +59,13 @@ public async Task ReinitializeConnectionAsync(bool reConnect = true, byte[]? com
 
       public async void CleanRemote(){
 
+    Console.WriteLine("0");
         if (_remoteConnect != null)
         {
             _remoteConnect.Dispose();
             _remoteConnect = null;
         }
+        Console.WriteLine("1");
 
     }
 

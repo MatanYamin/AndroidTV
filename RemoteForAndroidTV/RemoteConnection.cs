@@ -494,20 +494,25 @@ public class RemoteConnection
 
     public void Dispose()
     {
+        Console.WriteLine("00");
         Dispose(true);
         GC.SuppressFinalize(this);
+        Console.WriteLine("01");
     }
 
    protected virtual async void Dispose(bool disposing)
     {
+        Console.WriteLine("5");
         if (_disposed)
             return;
-
+Console.WriteLine("6");
         if (disposing)
         {
-            CloseConnectionAsync().Wait(); // Ensure async cleanup is complete
+            Console.WriteLine("7");
+            await CloseConnectionAsync(); // Ensure async cleanup is complete
+            Console.WriteLine("8");
         }
-
+Console.WriteLine("9");
         _disposed = true;
     }
 

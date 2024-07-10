@@ -35,12 +35,17 @@ public class SendCommands{
         _remoteConnect.SendRemoteButton(m2press);
     }
 
-     public async Task ReinitializeConnectionAsync(byte[]? command)
+public async Task ReinitializeConnectionAsync(bool reConnect = true, byte[]? command = null)
     {
         // Ensure the current connection is properly closed and disposed
         if (_remoteConnect != null)
         {
             _remoteConnect.Dispose();
+        }
+
+        if(!reConnect){
+            _remoteConnect.NotifyConnectionLost();
+            return;
         }
 
         // Create a new instance and initialize it
@@ -51,5 +56,17 @@ public class SendCommands{
             _remoteConnect.SendRemoteButton(command);
         }
     }
+
+      public async void CleanRemote(){
+
+        if (_remoteConnect != null)
+        {
+            _remoteConnect.Dispose();
+            _remoteConnect = null;
+        }
+
+    }
+
+
 
 }

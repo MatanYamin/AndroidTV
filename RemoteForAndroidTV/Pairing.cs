@@ -7,6 +7,7 @@ using System.Net.Security;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 
 public class Pairing
 {
@@ -70,6 +71,7 @@ public class Pairing
             using var client = new HttpClient(handler);
             try
             {
+                var response = await client.GetAsync(serverUrl);
                 // Console.WriteLine($"Making request to {serverUrl}...");
                 // var response = await client.GetAsync(serverUrl);
                 // No need to process the response since our goal is to fetch the certificate
@@ -96,7 +98,7 @@ public class Pairing
         return pemCert;
     }
 
-    private static void GenerateClientCertificate()
+    private void GenerateClientCertificate()
     {
         // Distinguished Name details
         var distinguishedName = new X500DistinguishedName("CN=atvremote, C=US, ST=California, L=Mountain View, O=Google Inc., OU=Android, E=example@google.com");
@@ -111,7 +113,7 @@ public class Pairing
             // Export the certificate and private key
             byte[] certBytes = certificate.Export(X509ContentType.Pfx);
 
-            SharedPref.SaveClientCertificate(certBytes);
+            SharedPref.SaveClientCertificate(this.SERVER_IP, certBytes);
         }
     }
 
@@ -148,7 +150,7 @@ public class Pairing
 
             byte[]? serverResponse;
 
-            byte[]? certificateContent = SharedPref.LoadClientCertificate();
+            byte[]? certificateContent = SharedPref.LoadClientCertificate(this.SERVER_IP);
 
             if (certificateContent == null)
             {
@@ -285,7 +287,7 @@ public class Pairing
             // nonce are the last 4 characters of the code displayed on the TV
             byte[] nonce = FromHexString(code.Substring(2)).ToArray();
 
-            X509Certificate2 clientCertificate = new X509Certificate2(SharedPref.LoadClientCertificate());
+            X509Certificate2 clientCertificate = new X509Certificate2(SharedPref.LoadClientCertificate(this.SERVER_IP));
             string pemCert = SharedPref.LoadServerCertificate();
             X509Certificate2 serverCertificate = LoadCertificateFromPem(pemCert);
 

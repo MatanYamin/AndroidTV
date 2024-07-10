@@ -15,6 +15,7 @@ using System.Collections.Concurrent;
 
 public class RemoteConnection
 {
+    int attempsForRecconecting, maxAttemps;
     private bool _disposed = false;
     private bool _isSendingPong = false;
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
@@ -65,7 +66,7 @@ public class RemoteConnection
         {
             X509Certificate2 clientCertificate = await Task.Run(() => 
             {
-                return new X509Certificate2(SharedPref.LoadClientCertificate());
+                return new X509Certificate2(SharedPref.LoadClientCertificate(this.SERVER_IP));
             });
 
             _client = new TcpClient();
@@ -297,18 +298,16 @@ public class RemoteConnection
             Console.WriteLine($"Exception in WaitForPings: {ex.Message}");
             throw;
         }
-        finally
-        {
-            Console.WriteLine("WaitForPings task is completing.");
-        }
+       
     }
 
-    private static void NotifyConnectionLost()
+    public void NotifyConnectionLost()
     {
+        SharedPref.RemoveKey(this.SERVER_IP);
         ConnectionLostEvent?.Invoke(null, EventArgs.Empty);
     }
 
-    private static void NotifyConnectionSuccess()
+    private void NotifyConnectionSuccess()
     {
         ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
     }
@@ -499,7 +498,7 @@ public class RemoteConnection
         GC.SuppressFinalize(this);
     }
 
-     protected virtual void Dispose(bool disposing)
+   protected virtual async void Dispose(bool disposing)
     {
         if (_disposed)
             return;
@@ -519,7 +518,12 @@ public class RemoteConnection
 
     // This closes the connection and reconnect
     async void KillAndReConnect(byte[]? command = null){
-       await _sendCommands.ReinitializeConnectionAsync(command);
+        bool reconnect = true;
+
+        if(++attempsForRecconecting > maxAttemps){
+            reconnect = false;
+        }
+       await _sendCommands.ReinitializeConnectionAsync(reconnect, command);
     }
 
 }

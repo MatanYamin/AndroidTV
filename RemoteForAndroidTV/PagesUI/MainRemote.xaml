@@ -6,5 +6,6 @@
     <StackLayout>
          <Button Text="Channel Up" Clicked="OnBTN1" />
          <Button Text="1" Clicked="OnBTN2" />
+          <Button Text="Switch" Clicked="SwitchDevice" />
     </StackLayout>
 </ContentPage>

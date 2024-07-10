@@ -9,6 +9,8 @@ namespace RemoteForAndroidTV
         Pairing _pairing;
         string ip;
         MainRemote _remote = null;
+
+        byte[]? _clientCertificate;
         public EnterCodePage(DeviceInfo deviceInfo)
         {
 
@@ -18,11 +20,25 @@ namespace RemoteForAndroidTV
 
             this.ip = deviceInfo.IP;
 
-            _remote = new MainRemote(ip);
+            _remote = new MainRemote(ip, this);
+
+            _clientCertificate = null;
+
+            _clientCertificate = TryLoadClientCertificate(ip);
+
+            if(_clientCertificate != null){
+                Task.Run(() => _remote.InitializeAsync());
+                return;
+            }
 
             _pairing = new Pairing(deviceInfo.IP);
             Task.Run(() => _pairing.StartPairing());
 
+        }
+
+        byte[]? TryLoadClientCertificate(string ip){
+
+            return SharedPref.LoadClientCertificate(ip);
         }
 
         protected override void OnAppearing()
@@ -34,6 +50,8 @@ namespace RemoteForAndroidTV
 
           
         }
+
+
 
         private void OnEntryTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -120,6 +138,11 @@ namespace RemoteForAndroidTV
             RemoteConnection.ConnectionLostEvent -= ConnectionLost;
             Pairing.ConnectionLostEvent -= ConnectionLost;
 
+        }
+
+        public async void SwitchDevice(){
+            UnSubscribeEvents();
+            await Navigation.PopAsync();
         }
 
     }

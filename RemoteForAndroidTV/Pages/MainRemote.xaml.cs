@@ -36,9 +36,11 @@ public partial class MainRemote : ContentPage{
     {
         _commands.CleanRemote();
 
-        await Navigation.PopAsync();
 
-        _enterCodePage.SwitchDevice();
+        await Navigation.PopToRootAsync();
+        // await Navigation.PopAsync();
+
+        // _enterCodePage.SwitchDevice();
     }
 
 

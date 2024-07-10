@@ -319,23 +319,23 @@ public class RemoteConnection
             Console.WriteLine("Closing connection...");
             _pingCancellationTokenSource?.Cancel();
 
-            if (_listeningTask != null)
-            {
-                Console.WriteLine("Waiting for listening task to complete...");
-                try
-                {
-                    await _listeningTask;
-                    Console.WriteLine("Listening task completed.");
-                }
-                catch (OperationCanceledException)
-                {
-                    Console.WriteLine("OperationCanceledException while waiting for listening task.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Exception while waiting for listening task: {ex.Message}");
-                }
-            }
+            // if (_listeningTask != null)
+            // {
+            //     Console.WriteLine("Waiting for listening task to complete...");
+            //     try
+            //     {
+            //         await _listeningTask;
+            //         Console.WriteLine("Listening task completed.");
+            //     }
+            //     catch (OperationCanceledException)
+            //     {
+            //         Console.WriteLine("OperationCanceledException while waiting for listening task.");
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         Console.WriteLine($"Exception while waiting for listening task: {ex.Message}");
+            //     }
+            // }
 
             if (_sslStream != null)
             {

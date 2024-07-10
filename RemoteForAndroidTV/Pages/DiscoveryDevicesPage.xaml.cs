@@ -12,6 +12,21 @@ namespace RemoteForAndroidTV
             InitializeComponent();
             GetNearbyDevicesFinder();
             DevicesListView.ItemsSource = Devices;
+
+            string lastRemoteIp = SharedPref.GetLastRemoteIP();
+            string lastRemoteName = SharedPref.GetLastRemoteName();
+
+            if(!string.IsNullOrEmpty(lastRemoteIp)){
+                var info = new DeviceInfo { Name = lastRemoteName, IP = lastRemoteIp };
+                MoveNextStep(info);
+            }
+        }
+
+        async void MoveNextStep(DeviceInfo info){
+               await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Navigation.PushAsync(new EnterCodePage(info));
+            });
         }
 
         private void GetNearbyDevicesFinder()

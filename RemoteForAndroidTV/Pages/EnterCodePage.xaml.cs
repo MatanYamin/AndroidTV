@@ -10,6 +10,7 @@ namespace RemoteForAndroidTV
         string ip;
         MainRemote _remote = null;
 
+
         byte[]? _clientCertificate;
         public EnterCodePage(DeviceInfo deviceInfo)
         {
@@ -19,6 +20,8 @@ namespace RemoteForAndroidTV
             SubscribeEvents();
 
             this.ip = deviceInfo.IP;
+
+            SharedPref.SaveLastRemote(this.ip, deviceInfo.Name);
 
             _remote = new MainRemote(ip, this);
 
@@ -50,8 +53,6 @@ namespace RemoteForAndroidTV
 
           
         }
-
-
 
         private void OnEntryTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -108,7 +109,6 @@ namespace RemoteForAndroidTV
             // UnSubscribeEvents();
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                
                 await Navigation.PushAsync(_remote);
             });
         } 
@@ -119,8 +119,8 @@ namespace RemoteForAndroidTV
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 UnSubscribeEvents();
-                // await Navigation.PushAsync(new DiscoveryDevicesPage());
-                await Navigation.PopAsync();
+                SharedPref.RemoveKey(this.ip);
+                await Navigation.PopToRootAsync();
             });
         }     
 
@@ -138,11 +138,6 @@ namespace RemoteForAndroidTV
             RemoteConnection.ConnectionLostEvent -= ConnectionLost;
             Pairing.ConnectionLostEvent -= ConnectionLost;
 
-        }
-
-        public async void SwitchDevice(){
-            UnSubscribeEvents();
-            await Navigation.PopAsync();
         }
 
     }

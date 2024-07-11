@@ -24,11 +24,15 @@ namespace RemoteForAndroidTV
             };
         }
 
-        public async Task StartDiscoveryAsync(string serviceType)
+         public async Task<bool> StartDiscoveryAsync(string serviceType)
         {
             _tcs = new TaskCompletionSource<bool>();
             _serviceBrowser.SearchForServices(serviceType, "local.");
-            await _tcs.Task;
+            
+            // Timeout to handle permission denial
+            await Task.WhenAny(_tcs.Task, Task.Delay(5000));
+            
+            return _tcs.Task.IsCompleted && _tcs.Task.Result;
         }
 
         public async Task StopDiscoveryAsync()

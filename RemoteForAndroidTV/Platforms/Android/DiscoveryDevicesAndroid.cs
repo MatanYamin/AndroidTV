@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Zeroconf;
+using System.Diagnostics;
 
 namespace RemoteForAndroidTV
 {
@@ -10,21 +11,22 @@ namespace RemoteForAndroidTV
         private const int SEARCH_DURATION = 5000; // Duration for each search in milliseconds
         private ObservableCollection<DeviceInfo> devices;
         private CancellationTokenSource? _cancellationTokenSource;
+        private bool isSearching;
 
         public DiscoveryDevicesAndroid(ObservableCollection<DeviceInfo> devices)
         {
             this.devices = devices;
-            Console.WriteLine("DiscoveryDevicesAndroid initialized.");
+            Debug.WriteLine("DISCOVERY_LOG: DiscoveryDevicesAndroid initialized.");
         }
 
         private async Task DiscoverServicesWithRetries(int retries, CancellationToken cancellationToken)
         {
-            Console.WriteLine("Starting discovery with retries...");
+            Debug.WriteLine("DISCOVERY_LOG: Starting discovery with retries...");
             for (int i = 0; i < retries; i++)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    Console.WriteLine("Discovery cancelled.");
+                    Debug.WriteLine("DISCOVERY_LOG: Discovery cancelled.");
                     break;
                 }
 
@@ -34,87 +36,98 @@ namespace RemoteForAndroidTV
                 }
                 catch (OperationCanceledException)
                 {
-                    Console.WriteLine("Discovery operation was cancelled.");
+                    Debug.WriteLine("DISCOVERY_LOG: Discovery operation was cancelled.");
                     break;
                 }
 
-                Console.WriteLine("Waiting before next retry...");
+                Debug.WriteLine("DISCOVERY_LOG: Waiting before next retry...");
                 try
                 {
                     await Task.Delay(SEARCH_DURATION, cancellationToken); // Wait for the specified duration before retrying
                 }
                 catch (OperationCanceledException)
                 {
-                    Console.WriteLine("Discovery delay was cancelled.");
+                    Debug.WriteLine("DISCOVERY_LOG: Discovery delay was cancelled.");
                     break;
                 }
             }
-            Console.WriteLine("Discovery with retries completed.");
+            Debug.WriteLine("DISCOVERY_LOG: Discovery with retries completed.");
         }
 
         private async Task DiscoverServices(CancellationToken cancellationToken)
         {
             try
             {
-                Console.WriteLine($"Attempting to resolve services with type: {values.ServiceType()}");
+                Debug.WriteLine($"DISCOVERY_LOG: Attempting to resolve services with type: {values.ServiceType()}");
                 var responses = await ZeroconfResolver.ResolveAsync(values.ServiceType());
 
                 foreach (var resp in responses)
                 {
+                    Debug.WriteLine($"DISCOVERY_LOG: Found response: {resp.DisplayName}");
                     foreach (var service in resp.Services)
                     {
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            Console.WriteLine("Discovery cancelled.");
+                            Debug.WriteLine("DISCOVERY_LOG: Discovery cancelled.");
                             return;
                         }
 
                         var ipAddress = resp.IPAddresses.FirstOrDefault(); // Get the first IP address
                         if (!string.IsNullOrEmpty(ipAddress))
                         {
+                            Debug.WriteLine($"DISCOVERY_LOG: Found service: {service.Key} with IP: {ipAddress}");
                             if (!devices.Any(d => d.Name == resp.DisplayName && d.IP == ipAddress))
                             {
                                 devices.Add(new DeviceInfo { Name = resp.DisplayName, IP = ipAddress });
                             }
-                            else
-                            {
-                            }
                         }
                         else
                         {
+                            Debug.WriteLine("DISCOVERY_LOG: No IP address found for service.");
                         }
                     }
                 }
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("Discovery operation cancelled.");
+                Debug.WriteLine("DISCOVERY_LOG: Discovery operation cancelled.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error discovering services: {ex.Message}");
+                Debug.WriteLine($"DISCOVERY_LOG: Error discovering services: {ex.Message}");
             }
         }
 
-        public async Task StartDevicesFindingAsync()
+        public async Task<bool> StartDevicesFindingAsync()
         {
+            Debug.WriteLine("DISCOVERY_LOG: Starting devices finding...");
             _cancellationTokenSource = new CancellationTokenSource();
-            try
+            isSearching = true;
+            while (isSearching)
             {
-                await DiscoverServicesWithRetries(RETRY_COUNT, _cancellationTokenSource.Token);
+                try
+                {
+                    await DiscoverServicesWithRetries(RETRY_COUNT, _cancellationTokenSource.Token);
+                    Debug.WriteLine("DISCOVERY_LOG: Device finding was successful.");
+                    return true; // If discovery is successful
+                }
+                catch (OperationCanceledException)
+                {
+                    Debug.WriteLine("DISCOVERY_LOG: Device finding was cancelled.");
+                }
+
+                await Task.Delay(5000); // Adjust the delay as needed
             }
-            catch (OperationCanceledException)
-            {
-                Console.WriteLine("Device finding was cancelled.");
-            }
+            Debug.WriteLine("DISCOVERY_LOG: Device finding was not successful.");
+            return false; // If discovery is not successful
         }
 
         public Task StopDevicesFindingAsync()
         {
-           _cancellationTokenSource?.Cancel();
+            Debug.WriteLine("DISCOVERY_LOG: Stopping devices finding...");
+            isSearching = false;
+            _cancellationTokenSource?.Cancel();
             return Task.CompletedTask;
         }
-
     }
-   
 }

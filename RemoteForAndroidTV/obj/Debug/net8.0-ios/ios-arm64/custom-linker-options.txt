@@ -8,7 +8,7 @@ AreAnyAssembliesTrimmed=false
 				CacheDirectory=/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-ios/ios-arm64/linker-cache
 				
 				Debug=true
-				DeploymentTarget=11.0
+				DeploymentTarget=15.0
 				
 				EnableSGenConc=false
 				

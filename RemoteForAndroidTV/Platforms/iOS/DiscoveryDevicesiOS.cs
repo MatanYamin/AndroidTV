@@ -29,9 +29,9 @@ namespace RemoteForAndroidTV
             };
         }
 
-        public async Task StartDevicesFindingAsync()
+        public async Task<bool> StartDevicesFindingAsync()
         {
-            await bonjourServiceDiscovery.StartDiscoveryAsync(values.ServiceType());
+            return await bonjourServiceDiscovery.StartDiscoveryAsync(values.ServiceType());
         }
 
         public async Task StopDevicesFindingAsync()

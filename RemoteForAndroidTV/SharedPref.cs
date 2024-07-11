@@ -4,6 +4,7 @@ public static class SharedPref
 
     static string LAST_REMOTE_IP = "LastRemoteIP";
     static string LAST_REMOTE_NAME = "LastRemoteName";
+    static string TIMES_IN_APP = "TimesInApp";
 
     public static void SaveClientCertificate(string ip, byte[] content)
     {
@@ -14,6 +15,7 @@ public static class SharedPref
     public static byte[]? LoadClientCertificate(string ip)
     {
         string base64String = Preferences.Get(ip, string.Empty);
+        if(base64String == ""){Console.WriteLine("EMPTY CLIENTTT");}
         return string.IsNullOrEmpty(base64String) ? null : Convert.FromBase64String(base64String);
     }
 
@@ -24,6 +26,7 @@ public static class SharedPref
 
     public static string LoadServerCertificate()
     {
+        if(Preferences.Get("serverCertificate", string.Empty) == ""){Console.WriteLine("EMPTY SERVERRRR");}
         return Preferences.Get("serverCertificate", string.Empty);
     }
 
@@ -48,6 +51,17 @@ public static class SharedPref
 
         SaveLastRemoteIP(ip);
         SaveLastRemoteName(name);
+    }
+
+    public static int GetTimesInApp(){
+        return Preferences.Get(TIMES_IN_APP, 1);
+    }
+
+    public static void EnteringAppSaveCount(){
+
+        int currentTimes = Preferences.Get(TIMES_IN_APP, 0) + 1;
+        Preferences.Set(TIMES_IN_APP, currentTimes);
+
     }
 
 }

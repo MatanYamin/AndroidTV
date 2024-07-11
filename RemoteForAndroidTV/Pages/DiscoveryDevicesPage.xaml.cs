@@ -1,10 +1,15 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+#if IOS
+using Foundation;
+using UIKit;
+#endif
 
 namespace RemoteForAndroidTV
 {
     public partial class DiscoveryDevicesPage : ContentPage
     {
+        int countPermissionCheckTimes = 0;
         private INearbyDevicesFinder? _deviceFinder;
         public ObservableCollection<DeviceInfo> Devices { get; set; } = new ObservableCollection<DeviceInfo>();
 
@@ -12,7 +17,7 @@ namespace RemoteForAndroidTV
         {
             InitializeComponent();
 
-            Debug.WriteLine("DISCOVERY_PAGE_LOG: Initializing DiscoveryDevicesPage.");
+            SharedPref.EnteringAppSaveCount();
 
             GetNearbyDevicesFinder();
             DevicesListView.ItemsSource = Devices;
@@ -20,21 +25,11 @@ namespace RemoteForAndroidTV
             string lastRemoteIp = SharedPref.GetLastRemoteIP();
             string lastRemoteName = SharedPref.GetLastRemoteName();
 
-            Debug.WriteLine($"DISCOVERY_PAGE_LOG: Last remote IP: {lastRemoteIp}, Last remote name: {lastRemoteName}");
-
-            if (!string.IsNullOrEmpty(lastRemoteIp))
-            {
-                var info = new DeviceInfo { Name = lastRemoteName, IP = lastRemoteIp };
-                MoveNextStep(info);
-                return;
-            }
-
             SearchDevices();
 
             // Listen for the app entering the foreground
             MessagingCenter.Subscribe<App>(this, "AppEnteredForeground", (sender) =>
             {
-                Debug.WriteLine("DISCOVERY_PAGE_LOG: App entered foreground.");
 
                 if (Devices.Count > 0)
                 {
@@ -44,6 +39,13 @@ namespace RemoteForAndroidTV
 
                 SearchDevices();
             });
+
+             if (!string.IsNullOrEmpty(lastRemoteIp))
+            {
+                var info = new DeviceInfo { Name = lastRemoteName, IP = lastRemoteIp };
+                MoveNextStep(info);
+                return;
+            }
         }
 
         async void MoveNextStep(DeviceInfo info)
@@ -68,7 +70,6 @@ namespace RemoteForAndroidTV
 
         private async void OnStartDiscoveryClicked(object sender, EventArgs e)
         {
-            Debug.WriteLine("DISCOVERY_PAGE_LOG: Start discovery clicked.");
             Devices.Clear();
             await (_deviceFinder?.StartDevicesFindingAsync() ?? Task.CompletedTask);
             DiscoveryStatusLabel.Text = "Discovery running...";
@@ -76,18 +77,18 @@ namespace RemoteForAndroidTV
 
         private async void SearchDevices()
         {
-            Debug.WriteLine("DISCOVERY_PAGE_LOG: Starting device search.");
             // Devices.Clear();
             bool isPermissionGranted = await (_deviceFinder?.StartDevicesFindingAsync() ?? Task.FromResult(false));
 
             if (isPermissionGranted)
             {
-                Debug.WriteLine("DISCOVERY_PAGE_LOG: Device discovery running.");
                 DiscoveryStatusLabel.Text = "Discovery running...";
             }
             else
             {
-                Debug.WriteLine("DISCOVERY_PAGE_LOG: Permission denied or discovery failed.");
+
+                if(SharedPref.GetTimesInApp() == 1 && ++countPermissionCheckTimes == 1){return;}
+
                 bool goToSettings = await DisplayAlert("Permission Denied", "Local network access is required to discover devices. Please enable it in settings.", "Go to Settings", "Cancel");
                 if (goToSettings)
                 {

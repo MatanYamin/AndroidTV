@@ -24,7 +24,7 @@
         </Grid.Background>
 
         <!-- Content in the top -->
-        <StackLayout VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Padding="30,0" Spacing="10">
+        <StackLayout x:Name="UI1"  VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Padding="30,0" Spacing="10">
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="10">
                 <StackLayout>
                     <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry1" />
@@ -59,5 +59,16 @@
 
             <Button Text="OK" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnOkButtonClicked"/>
         </StackLayout>
+
+        <StackLayout x:Name="UI2" IsVisible="False">
+        <!-- Your second UI controls here -->
+        <StackLayout Orientation="Vertical" HorizontalOptions="Center" Spacing="10">
+        <Label Text="LOADING" />
+        <Label Text="LOADING" />
+        <Label Text="LOADING" />
+
+        </StackLayout>
+        <!-- Add more controls as needed -->
+    </StackLayout>
     </Grid>
 </ContentPage>

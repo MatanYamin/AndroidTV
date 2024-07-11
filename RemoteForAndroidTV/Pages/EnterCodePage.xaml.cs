@@ -7,7 +7,7 @@ namespace RemoteForAndroidTV
     public partial class EnterCodePage : ContentPage
     {
         Pairing _pairing;
-        string ip;
+        string ip, name;
         MainRemote _remote = null;
 
 
@@ -20,8 +20,7 @@ namespace RemoteForAndroidTV
             SubscribeEvents();
 
             this.ip = deviceInfo.IP;
-
-            SharedPref.SaveLastRemote(this.ip, deviceInfo.Name);
+            this.name = deviceInfo.Name;
 
             _remote = new MainRemote(ip, this);
 
@@ -34,7 +33,7 @@ namespace RemoteForAndroidTV
                 return;
             }
 
-            _pairing = new Pairing(deviceInfo.IP);
+            _pairing = new Pairing(ip);
             Task.Run(() => _pairing.StartPairing());
 
         }
@@ -50,7 +49,6 @@ namespace RemoteForAndroidTV
             Device.BeginInvokeOnMainThread(() => {
                 Entry1.Focus();
             });
-
           
         }
 
@@ -77,6 +75,16 @@ namespace RemoteForAndroidTV
             }
         }
 
+        int GetTVcodeCount(){
+            string enteredCode = $"{Entry1.Text}{Entry2.Text}{Entry3.Text}{Entry4.Text}{Entry5.Text}{Entry6.Text}";
+            return enteredCode.Length;
+        }
+
+        string GetTvCodeString(){
+            string enteredCode = $"{Entry1.Text}{Entry2.Text}{Entry3.Text}{Entry4.Text}{Entry5.Text}{Entry6.Text}";
+            return enteredCode;
+        }
+
         private void FocusNextEntry(Entry currentEntry)
         {
             if (currentEntry == Entry1) Entry2.Focus();
@@ -97,8 +105,17 @@ namespace RemoteForAndroidTV
 
         private async void OnOkButtonClicked(object sender, EventArgs e)
         {
+
+            int codeLen = GetTVcodeCount();
+
+            if(codeLen != 6){
+                // TODO: Add a line that say not entered 6 letters
+                return;
+            }
+
+
             // Concatenate the text from all entry fields
-            string enteredCode = $"{Entry1.Text}{Entry2.Text}{Entry3.Text}{Entry4.Text}{Entry5.Text}{Entry6.Text}";
+            string enteredCode = GetTvCodeString();
 
             await _pairing.ConnectWithCode(enteredCode);
 
@@ -106,7 +123,11 @@ namespace RemoteForAndroidTV
         }
 
         public async void ConnectionSuccess(object sender, EventArgs e){
+
             // UnSubscribeEvents();
+            SharedPref.SaveLastRemote(this.ip, this.name);
+
+
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 await Navigation.PushAsync(_remote);

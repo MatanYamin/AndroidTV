@@ -258,6 +258,8 @@ public class Pairing
             VerifyResult(serverResponse);
 
             CloseConnection();
+
+
         }
         catch (Exception ex)
         {
@@ -278,7 +280,6 @@ public class Pairing
         return new X509Certificate2(certBytes);
 
     }
-
 
     private async Task<byte[]> EncryptSecretAsync(string code)
     {

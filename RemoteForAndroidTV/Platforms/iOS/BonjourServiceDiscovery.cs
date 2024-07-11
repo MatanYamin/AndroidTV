@@ -30,7 +30,7 @@ namespace RemoteForAndroidTV
             _serviceBrowser.SearchForServices(serviceType, "local.");
             
             // Timeout to handle permission denial
-            await Task.WhenAny(_tcs.Task, Task.Delay(5000));
+            await Task.WhenAny(_tcs.Task, Task.Delay(2000));
             
             return _tcs.Task.IsCompleted && _tcs.Task.Result;
         }

@@ -1,14 +1,10 @@
 namespace RemoteForAndroidTV;
 using System;
 using System.IO;
-using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
-using Microsoft.Maui.Controls;
 using System.Net.Sockets;
-using System.Diagnostics;
 using System.Text;
 using System.Reflection;
 using System.Collections.Concurrent;
@@ -21,7 +17,6 @@ public class RemoteConnection
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
     private bool _isProcessingQueue = false;
     private readonly object _queueLock = new object();
-
     public delegate void NotifyEventHandler(object? sender, EventArgs e);
     public static event NotifyEventHandler ConnectionSuccessEvent, ConnectionLostEvent;
 
@@ -440,8 +435,8 @@ public class RemoteConnection
         byte m5 = 1;
         myliST.Add(m5);
 
-        // YOUR_APP_VERSION_NUMBER: e.g. 1 becomes 49
-        byte m6 = 49;  // if the app version is 1 = 49...
+        byte m6 = PLATFORM_VALUES.GetVersionCode();  // if the app version is 1 = 49...
+        Console.WriteLine("MATAN YAMIN VER: " + m6);
         myliST.Add(m6);
 
         // 42: tag

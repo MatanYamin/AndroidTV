@@ -15,7 +15,7 @@ public class AppInitializer{
         SaveAppEntrance();
 
         // This will initiate internet check every X seconds
-        StartInternetCheck(Values._checkinternetConnectionEvery);
+        StartInternetCheck(Values.RemoteConnect._checkinternetConnectionEvery);
     }
     
     public void StartInternetCheck(int checkEvery)

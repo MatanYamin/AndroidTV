@@ -11,9 +11,9 @@ using System.Collections.Concurrent;
 
 public class RemoteConnection
 {
-    int attempsForRecconecting, maxAttemps = 2;
+    int attempsForRecconecting;
     const int SEND_COMMANDS_PORT = 6466;
-    private bool _disposed = false, _isSendingPong = false, _isProcessingQueue = false;
+    private bool _disposed, _isSendingPong, _isProcessingQueue;
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
     private readonly object _queueLock = new();
     private static IValues PLATFORM_VALUES = default!;
@@ -49,22 +49,34 @@ public class RemoteConnection
     {
         try
         {
+            await Task.Delay(100);
 
+            // Get client certificate
             X509Certificate2 clientCertificate = new X509Certificate2(SharedPref.LoadClientCertificate(this.SERVER_IP));
+
+            // create client connection
             _client = new TcpClient();
             await _client.ConnectAsync(SERVER_IP, SEND_COMMANDS_PORT);
+
+            // Authenticate
             _sslStream = new SslStream(_client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate));
             await _sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509Certificate2Collection(clientCertificate), false);
 
+            // We should get a reponse from the server
             await ReadServerMessage();
 
+            // Sending the config message
             byte[] configMess = buildConfigMess();
             await SendServerMessage(configMess);
 
+            // We should get a reponse from the server
             await ReadServerMessage();
 
+            // Sending last payload
             await SendServerMessage(Values.RemoteConnect.SecondPayload);
             await ReadServerMessage();
+
+            // The server should send 3 messages
             // for (int i = 0; i < 3; i++)
             // {
             //     await ReadServerMessage();
@@ -78,25 +90,28 @@ public class RemoteConnection
         catch (SocketException ex)
         {
             Console.WriteLine($"SocketException in ConnectToDevice: {ex.Message}");
-            NotifyConnectionLost();
+            NotifyConnectionLost(true);
         }
         catch (IOException ex)
         {
             Console.WriteLine($"IOException in ConnectToDevice: {ex.Message}");
-            NotifyConnectionLost();
+            NotifyConnectionLost(true);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in ConnectToDevice: {ex.Message}");
-            NotifyConnectionLost();
+            NotifyConnectionLost(true);
         }
       
     }
 
     private async Task<byte[]?> ReadServerMessage()
     {
+        if(!PLATFORM_VALUES.IsConnectedToInternet()){return null;}
+
         try
         {
+
             byte[] buffer = new byte[100];
             int bytesRead = await _sslStream.ReadAsync(buffer, 0, buffer.Length);
 
@@ -106,68 +121,66 @@ public class RemoteConnection
             }
             else
             {
-                Console.WriteLine("No bytes read from server.");
                 NotifyConnectionLost();
                 return null;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Exception in ReadServerMessage: {ex.Message}");
             NotifyConnectionLost();
             return null;
         }
     }
 
-  private async Task SendServerMessage(byte[] message)
-{
-    byte[] messageLengthArray = [(byte)message.Length];
-
-    try
+    private async Task SendServerMessage(byte[] message)
     {
-        await _sslStream.WriteAsync(messageLengthArray, 0, messageLengthArray.Length);
-        await Task.Delay(100);
-        await _sslStream.WriteAsync(message, 0, message.Length);
-        await _sslStream.FlushAsync();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Exception in SendServerMessage: {ex.Message}");
+        if(!PLATFORM_VALUES.IsConnectedToInternet()){return;}
 
-        CloseConnectionAsync(); // Ensure connection cleanup on error
-    }
-}
-
-
- public void SendRemoteButton(byte[] command)
-{
-
-    if(!PLATFORM_VALUES.IsConnectedToInternet()){return;}
-    
-    byte[] messageLengthArray = [(byte)command.Length];
-
-    EnqueueOperation(async () =>
-    {
+        byte[] messageLengthArray = [(byte)message.Length];
         try
         {
             await _sslStream.WriteAsync(messageLengthArray, 0, messageLengthArray.Length);
             await Task.Delay(100);
-            await _sslStream.WriteAsync(command, 0, command.Length);
-            await _sslStream.FlushAsync();
+            await _sslStream.WriteAsync(message, 0, message.Length);
 
-        }
-        catch (IOException ex)
-        {
-            Console.WriteLine($"IOException in SendRemoteButton: {ex.Message}");
-            KillAndReConnect(command);
+            await _sslStream.FlushAsync();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception in SendRemoteButton: {ex.Message}");
-            KillAndReConnect(command);
+            Console.WriteLine($"Exception in SendServerMessage: {ex.Message}");
+            CloseConnectionAsync(); // Ensure connection cleanup on error
         }
-    });
-}
+    }
+
+    public void SendRemoteButton(byte[] command)
+    {
+        if(!PLATFORM_VALUES.IsConnectedToInternet()){return;}
+        
+        byte[] messageLengthArray = [(byte)command.Length];
+
+        EnqueueOperation(async () =>
+        {
+            try
+            {
+                await _sslStream.WriteAsync(messageLengthArray, 0, messageLengthArray.Length);
+                await Task.Delay(100);
+                await _sslStream.WriteAsync(command, 0, command.Length);
+
+                await _sslStream.FlushAsync();
+
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"IOException in SendRemoteButton: {ex.Message}");
+                KillAndReConnect(command);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in SendRemoteButton: {ex.Message}");
+                KillAndReConnect(command);
+            }
+        });
+    }
 
     private void EnqueueOperation(Func<Task> operation)
     {
@@ -187,14 +200,12 @@ public class RemoteConnection
     {
         try
         {
-            Console.WriteLine("Listening for pings...");
-            while (!cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested && PLATFORM_VALUES.IsConnectedToInternet())
             {
                 await WaitForPings(_sslStream, cancellationToken);
                 // Add a small delay to prevent a tight loop
                 await Task.Delay(100, cancellationToken);
             }
-            Console.WriteLine("Cancellation requested, exiting ListenForPings loop.");
         }
         catch (OperationCanceledException)
         {
@@ -272,10 +283,10 @@ public class RemoteConnection
         }
     }
 
-    public void NotifyConnectionLost()
+    public void NotifyConnectionLost(bool reconnect = false)
     {
         CloseConnectionAsync();
-        _connectHandler.ConnectionFailed();
+        _connectHandler.ConnectionFailed(reconnect);
     }
 
     private void NotifyConnectionSuccess()
@@ -285,28 +296,9 @@ public class RemoteConnection
 
     private void CloseConnectionAsync()
     {
-        Console.WriteLine("CloseConnectionAsync");
         try
         {
             _pingCancellationTokenSource?.Cancel();
-
-            // if (_listeningTask != null)
-            // {
-            //     Console.WriteLine("Waiting for listening task to complete...");
-            //     try
-            //     {
-            //         await _listeningTask;
-            //         Console.WriteLine("Listening task completed.");
-            //     }
-            //     catch (OperationCanceledException)
-            //     {
-            //         Console.WriteLine("OperationCanceledException while waiting for listening task.");
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         Console.WriteLine($"Exception while waiting for listening task: {ex.Message}");
-            //     }
-            // }
 
             if (_sslStream != null)
             {
@@ -322,8 +314,6 @@ public class RemoteConnection
                 _client = null;
             }
 
-            Console.WriteLine("Connection closed successfully.");
-            // killme();
         }
         catch (Exception ex)
         {
@@ -464,25 +454,18 @@ public class RemoteConnection
 
     public void Dispose()
     {
-        Console.WriteLine("00");
         Dispose(true);
         GC.SuppressFinalize(this);
-        Console.WriteLine("01");
     }
 
    protected virtual void Dispose(bool disposing)
     {
-        Console.WriteLine("5");
         if (_disposed)
             return;
-Console.WriteLine("6");
         if (disposing)
         {
-            Console.WriteLine("7");
             CloseConnectionAsync(); // Ensure async cleanup is complete
-            Console.WriteLine("8");
         }
-Console.WriteLine("9");
         _disposed = true;
     }
 
@@ -495,7 +478,8 @@ Console.WriteLine("9");
     async void KillAndReConnect(byte[]? command = null){
         bool reconnect = true;
 
-        if(++attempsForRecconecting > maxAttemps){
+        if(++attempsForRecconecting > Values.RemoteConnect._maxAttempsToConnect){
+            attempsForRecconecting = 0;
             reconnect = false;
         }
        await _connectHandler.ReinitializeConnectionAsync(reconnect, command);

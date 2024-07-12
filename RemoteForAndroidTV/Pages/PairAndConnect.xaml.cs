@@ -6,12 +6,10 @@ namespace RemoteForAndroidTV
       
     public partial class PairAndConnect : ContentPage
     {
-        // Pairing _pairing;
-        // RemoteConnection _connecting;
-        HandlePairing _pairingHandler;
-        HandleConnect _connectHandler;
-        RemoteButtons _remoteButtons;
-        public string ip, name;
+        HandlePairing? _pairingHandler;
+        HandleConnect? _connectHandler;
+        RemoteButtons? _remoteButtons;
+        public string? ip, name;
 
         public PairAndConnect(DeviceInfo deviceInfo)
         {
@@ -27,7 +25,6 @@ namespace RemoteForAndroidTV
             this.ip = deviceInfo.IP;
             this.name = deviceInfo.Name;
 
-            Console.WriteLine("NAME " + this.name);
         }
 
         protected override void OnAppearing()
@@ -40,7 +37,7 @@ namespace RemoteForAndroidTV
 
         private void OnEntryTextChanged(object sender, TextChangedEventArgs e)
         {
-            _pairingHandler.HandleOnEntryTextChanged(sender, e);
+            _pairingHandler?.HandleOnEntryTextChanged(sender, e);
         }
 
         public int GetTVcodeCount(){
@@ -73,7 +70,7 @@ namespace RemoteForAndroidTV
 
         private void OnOkButtonClicked(object sender, EventArgs e)
         {
-            _pairingHandler.HandleOnOkButtonClicked(sender, e);
+            _pairingHandler?.HandleOnOkButtonClicked(sender, e);
         }
 
         public async void ConnectionSuccess(RemoteConnection remote){

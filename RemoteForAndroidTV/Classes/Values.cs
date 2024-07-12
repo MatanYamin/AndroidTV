@@ -2,7 +2,6 @@
 namespace RemoteForAndroidTV;
 public static class Values
 {
-    public static int _checkinternetConnectionEvery = 3; // in seconds
 
     public static class Pairing{
          private static readonly byte[] _firstPayloadMessage = 
@@ -21,9 +20,11 @@ public static class Values
     public static class RemoteConnect{
         private static readonly byte[] _secondPayload = [18, 3, 8, 238, 4];
         public static byte[] SecondPayload => _secondPayload;
-
         private static readonly byte[] _pong = [74, 2, 8, 25];
         public static byte[] Pong => _pong;
+        public static readonly int _maxAttempsToConnect = 2;
+        public static readonly int _checkinternetConnectionEvery = 3; // in seconds
+
     }
 
 

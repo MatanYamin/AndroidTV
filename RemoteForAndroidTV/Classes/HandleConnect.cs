@@ -7,6 +7,7 @@ public class HandleConnect{
     RemoteConnection _remoteConnect;
     PairAndConnect _pairAndConnectHandler;
     private readonly string ip;
+    int _reconnectAttemps;
     public HandleConnect(PairAndConnect pac){
 
         this._pairAndConnectHandler = pac;
@@ -22,7 +23,16 @@ public class HandleConnect{
 
     }
 
-    public void ConnectionFailed(){
+    async public void ConnectionFailed(bool reconnect = false){
+
+        // if we want to reconnect and the numbers of reconnections is allowed then try.
+        if(reconnect && ++_reconnectAttemps <= Values.RemoteConnect._maxAttempsToConnect){
+            await ReinitializeConnectionAsync(true, null);
+            return;
+        }
+
+        // we dont want to reconnect, notify the page that connection failed.
+        _reconnectAttemps = 0;
         _pairAndConnectHandler.ConnectionFailed();
     }
 
@@ -43,7 +53,6 @@ public class HandleConnect{
             return;
         }
 
-        Console.WriteLine("reconnect");
         // Create a new instance and initialize it
         _remoteConnect = new RemoteConnection(this.ip, this);
 

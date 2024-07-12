@@ -29,7 +29,9 @@ public class HandlePairing
         // Filter out any non-letter and non-digit characters
         if (!string.IsNullOrEmpty(entry.Text))
         {
+        
             string newText = new string(entry.Text.Where(char.IsLetterOrDigit).ToArray()).ToUpper();
+
             if (entry.Text != newText)
             {
                 entry.Text = newText;

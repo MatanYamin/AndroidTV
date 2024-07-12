@@ -40,17 +40,17 @@ build_metadata.AdditionalFiles.ManifestResourceName = RemoteForAndroidTV.PagesUI
 build_metadata.AdditionalFiles.TargetPath = PagesUI/DiscoveryDevicesPage.xaml
 build_metadata.AdditionalFiles.RelativePath = PagesUI/DiscoveryDevicesPage.xaml
 
-[/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/PagesUI/EnterCodePage.xaml]
-build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = RemoteForAndroidTV.PagesUI.EnterCodePage.xaml
-build_metadata.AdditionalFiles.TargetPath = PagesUI/EnterCodePage.xaml
-build_metadata.AdditionalFiles.RelativePath = PagesUI/EnterCodePage.xaml
-
 [/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/PagesUI/MainRemote.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = RemoteForAndroidTV.PagesUI.MainRemote.xaml
 build_metadata.AdditionalFiles.TargetPath = PagesUI/MainRemote.xaml
 build_metadata.AdditionalFiles.RelativePath = PagesUI/MainRemote.xaml
+
+[/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/PagesUI/PairAndConnect.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RemoteForAndroidTV.PagesUI.PairAndConnect.xaml
+build_metadata.AdditionalFiles.TargetPath = PagesUI/PairAndConnect.xaml
+build_metadata.AdditionalFiles.RelativePath = PagesUI/PairAndConnect.xaml
 
 [/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml

@@ -311,4 +311,3 @@
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-ios/ios-arm64/RemoteForAndroidTV.genruntimeconfig.cache
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-ios/ios-arm64/ref/RemoteForAndroidTV.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/CommunityToolkit.Mvvm.dll
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-ios/ios-arm64/resourcestamps/CommunityToolkit.Mvvm.stamp

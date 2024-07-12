@@ -17,9 +17,6 @@ public class RemoteConnection
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
     private bool _isProcessingQueue = false;
     private readonly object _queueLock = new object();
-    // public delegate void NotifyEventHandler(object? sender, EventArgs e);
-    // public static event NotifyEventHandler ConnectionSuccessEvent, ConnectionLostEvent;
-
     private static IValues PLATFORM_VALUES = default!;
     private static SslStream? _sslStream = default!;
     private static TcpClient? _client = default!;
@@ -27,7 +24,6 @@ public class RemoteConnection
     private readonly string SERVER_IP;
     private CancellationTokenSource _pingCancellationTokenSource = default!;
     private Task? _listeningTask = null;
-    // SendCommands _sendCommands;
     HandleConnect _connectHandler;
 
     public RemoteConnection(string ip, HandleConnect hc)
@@ -90,19 +86,19 @@ Console.WriteLine("4");
         catch (SocketException ex)
         {
             Console.WriteLine($"SocketException in ConnectToDevice: {ex.Message}");
-            await CloseConnectionAsync();
+            CloseConnectionAsync();
             NotifyConnectionLost();
         }
         catch (IOException ex)
         {
             Console.WriteLine($"IOException in ConnectToDevice: {ex.Message}");
-            await CloseConnectionAsync();
+            CloseConnectionAsync();
             NotifyConnectionLost();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in ConnectToDevice: {ex.Message}");
-            await CloseConnectionAsync();
+            CloseConnectionAsync();
             NotifyConnectionLost();
         }
         finally
@@ -125,7 +121,7 @@ Console.WriteLine("4");
             else
             {
                 Console.WriteLine("No bytes read from server.");
-                await CloseConnectionAsync();
+                CloseConnectionAsync();
                 NotifyConnectionLost();
                 return null;
             }
@@ -133,7 +129,7 @@ Console.WriteLine("4");
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in ReadServerMessage: {ex.Message}");
-            await CloseConnectionAsync();
+            CloseConnectionAsync();
             NotifyConnectionLost();
             return null;
         }
@@ -154,7 +150,7 @@ Console.WriteLine("4");
     {
         Console.WriteLine($"Exception in SendServerMessage: {ex.Message}");
 
-        await CloseConnectionAsync(); // Ensure connection cleanup on error
+        CloseConnectionAsync(); // Ensure connection cleanup on error
     }
 }
 
@@ -309,7 +305,7 @@ Console.WriteLine("4");
         // ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
     }
 
-    private async Task CloseConnectionAsync()
+    private void CloseConnectionAsync()
     {
         try
         {
@@ -438,7 +434,6 @@ Console.WriteLine("4");
         myliST.Add(m5);
 
         byte m6 = PLATFORM_VALUES.GetVersionCode();  // if the app version is 1 = 49...
-        Console.WriteLine("MATAN YAMIN VER: " + m6);
         myliST.Add(m6);
 
         // 42: tag
@@ -497,7 +492,7 @@ Console.WriteLine("4");
         Console.WriteLine("01");
     }
 
-   protected virtual async void Dispose(bool disposing)
+   protected virtual void Dispose(bool disposing)
     {
         Console.WriteLine("5");
         if (_disposed)
@@ -506,7 +501,7 @@ Console.WriteLine("6");
         if (disposing)
         {
             Console.WriteLine("7");
-            await CloseConnectionAsync(); // Ensure async cleanup is complete
+            CloseConnectionAsync(); // Ensure async cleanup is complete
             Console.WriteLine("8");
         }
 Console.WriteLine("9");

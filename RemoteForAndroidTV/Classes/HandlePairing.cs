@@ -6,6 +6,7 @@ public class HandlePairing
     PairAndConnect _pairAndConnectHandler;
     Pairing _pairing;
     private readonly string ip;
+
     public HandlePairing(PairAndConnect pac)
     {
 
@@ -63,7 +64,8 @@ public class HandlePairing
             _pairAndConnectHandler.StartConnecting();
         }
         else{
-            // Do something (maybe remove key from save)
+
+            _pairAndConnectHandler.ConnectionFailed();
         }
 
     }

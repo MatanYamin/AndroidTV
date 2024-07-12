@@ -11,16 +11,14 @@ using System.Collections.Concurrent;
 
 public class RemoteConnection
 {
-    int attempsForRecconecting, maxAttemps;
-    private bool _disposed = false;
-    private bool _isSendingPong = false;
+    int attempsForRecconecting, maxAttemps = 2;
+    const int SEND_COMMANDS_PORT = 6466;
+    private bool _disposed = false, _isSendingPong = false, _isProcessingQueue = false;
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
-    private bool _isProcessingQueue = false;
-    private readonly object _queueLock = new object();
+    private readonly object _queueLock = new();
     private static IValues PLATFORM_VALUES = default!;
     private static SslStream? _sslStream = default!;
     private static TcpClient? _client = default!;
-    const int SEND_COMMANDS_PORT = 6466;
     private readonly string SERVER_IP;
     private CancellationTokenSource _pingCancellationTokenSource = default!;
     private Task? _listeningTask = null;
@@ -28,7 +26,6 @@ public class RemoteConnection
 
     public RemoteConnection(string ip, HandleConnect hc)
     {
-        // _sendCommands = sc;
         _connectHandler = hc;
         this.SERVER_IP = ip;
         AssignPlatformValues();
@@ -52,19 +49,13 @@ public class RemoteConnection
     {
         try
         {
-                    Console.WriteLine("ConnectToDevice");
 
-            X509Certificate2 clientCertificate = await Task.Run(() => 
-            {
-                return new X509Certificate2(SharedPref.LoadClientCertificate(this.SERVER_IP));
-            });
-            Console.WriteLine("1");
+            X509Certificate2 clientCertificate = new X509Certificate2(SharedPref.LoadClientCertificate(this.SERVER_IP));
             _client = new TcpClient();
             await _client.ConnectAsync(SERVER_IP, SEND_COMMANDS_PORT);
-Console.WriteLine("2");
             _sslStream = new SslStream(_client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate));
             await _sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509Certificate2Collection(clientCertificate), false);
-Console.WriteLine("3");
+
             await ReadServerMessage();
 
             byte[] configMess = buildConfigMess();
@@ -73,38 +64,33 @@ Console.WriteLine("3");
             await ReadServerMessage();
 
             await SendServerMessage(Values.RemoteConnect.SecondPayload);
-            for (int i = 0; i < 3; i++)
-            {
-                await ReadServerMessage();
-            }
+            await ReadServerMessage();
+            // for (int i = 0; i < 3; i++)
+            // {
+            //     await ReadServerMessage();
+            // }
 
             _ = StartListeningForPings();
-Console.WriteLine("4");
+
             NotifyConnectionSuccess();
 
         }
         catch (SocketException ex)
         {
             Console.WriteLine($"SocketException in ConnectToDevice: {ex.Message}");
-            CloseConnectionAsync();
             NotifyConnectionLost();
         }
         catch (IOException ex)
         {
             Console.WriteLine($"IOException in ConnectToDevice: {ex.Message}");
-            CloseConnectionAsync();
             NotifyConnectionLost();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in ConnectToDevice: {ex.Message}");
-            CloseConnectionAsync();
             NotifyConnectionLost();
         }
-        finally
-        {
-            Console.WriteLine("Finished ConnectToDevice.");
-        }
+      
     }
 
     private async Task<byte[]?> ReadServerMessage()
@@ -121,7 +107,6 @@ Console.WriteLine("4");
             else
             {
                 Console.WriteLine("No bytes read from server.");
-                CloseConnectionAsync();
                 NotifyConnectionLost();
                 return null;
             }
@@ -129,7 +114,6 @@ Console.WriteLine("4");
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in ReadServerMessage: {ex.Message}");
-            CloseConnectionAsync();
             NotifyConnectionLost();
             return null;
         }
@@ -166,7 +150,6 @@ Console.WriteLine("4");
     {
         try
         {
-
             await _sslStream.WriteAsync(messageLengthArray, 0, messageLengthArray.Length);
             await Task.Delay(100);
             await _sslStream.WriteAsync(command, 0, command.Length);
@@ -230,7 +213,6 @@ Console.WriteLine("4");
             Console.WriteLine("ListenForPings task is completing.");
         }
     }
-
     private async Task WaitForPings(SslStream sslStream, CancellationToken cancellationToken)
     {
         byte[] buffer = new byte[128];
@@ -288,28 +270,24 @@ Console.WriteLine("4");
             Console.WriteLine($"Exception in WaitForPings: {ex.Message}");
             throw;
         }
-       
     }
 
     public void NotifyConnectionLost()
     {
-        // SharedPref.RemoveKey(this.SERVER_IP);
-        // ConnectionLostEvent?.Invoke(null, EventArgs.Empty);
+        CloseConnectionAsync();
         _connectHandler.ConnectionFailed();
     }
 
     private void NotifyConnectionSuccess()
     {
-        Console.WriteLine("successsssss");
         _connectHandler.ConnectionSuccess();
-        // ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
     }
 
     private void CloseConnectionAsync()
     {
+        Console.WriteLine("CloseConnectionAsync");
         try
         {
-            Console.WriteLine("Closing connection...");
             _pingCancellationTokenSource?.Cancel();
 
             // if (_listeningTask != null)

@@ -17,7 +17,6 @@ namespace RemoteForAndroidTV
         {
             InitializeComponent();
 
-            Console.WriteLine("Inside INIT PAIR AND CONNECT");
             Init(deviceInfo);
 
             HandleLastRemoteConnect();
@@ -27,6 +26,8 @@ namespace RemoteForAndroidTV
 
             this.ip = deviceInfo.IP;
             this.name = deviceInfo.Name;
+
+            Console.WriteLine("NAME " + this.name);
         }
 
         protected override void OnAppearing()
@@ -35,7 +36,6 @@ namespace RemoteForAndroidTV
             Device.BeginInvokeOnMainThread(() => {
                 Entry1.Focus();
             });
-          
         }
 
         private void OnEntryTextChanged(object sender, TextChangedEventArgs e)
@@ -91,7 +91,6 @@ namespace RemoteForAndroidTV
 
         public async void ConnectionFailed()
         {
-            
             RemoveKeyFromSave();
             // Ensure navigation happens on the main thread
             await MainThread.InvokeOnMainThreadAsync( () =>
@@ -104,7 +103,7 @@ namespace RemoteForAndroidTV
             SharedPref.SaveLastRemote(this.ip, this.name);
         }
 
-        void RemoveKeyFromSave(){
+        public void RemoveKeyFromSave(){
             SharedPref.RemoveKey(this.ip);
         }
 
@@ -118,18 +117,14 @@ namespace RemoteForAndroidTV
 
         void HandleLastRemoteConnect(){
 
-            Console.WriteLine("HandleLastRemoteConnect");
             bool didConnect = DidConnectedBefore(this.ip);
 
             if(!didConnect){
                 // This is the proccess from scratch
-                            Console.WriteLine("StartPairing");
-
                 StartPairing();
                 return;
             }
             else{
-                Console.WriteLine("StartConnecting");
                 // This is to connect for controling the remote
                 StartConnecting();
             }

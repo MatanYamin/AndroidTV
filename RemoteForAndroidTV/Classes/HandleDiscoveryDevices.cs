@@ -27,10 +27,11 @@ public class HandleDiscoveryDevices{
         // When user returns to the app we get notified
         SubscribeToOnResume();
 
+        // If this remote connected, move to next page
         LastRemoteState();
     }
 
-
+    // The list that displayed on the UI
     private void AssignUiDevicesList(){
         _discoveryPage?.AssingUIDevices(Devices);
     }
@@ -42,9 +43,9 @@ public class HandleDiscoveryDevices{
             if (Devices.Count > 0){return;}
             SearchDevices();
         });
-
     }
 
+    // Finds out which platform is for different search
     private void GetPlatform()
     {
         #if IOS

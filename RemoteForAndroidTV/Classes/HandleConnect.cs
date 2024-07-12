@@ -1,4 +1,5 @@
 
+using System.Diagnostics;
 using RemoteForAndroidTV;
 
 public class HandleConnect{
@@ -17,7 +18,6 @@ public class HandleConnect{
     }
 
     async private void StartConnection(){
-        Console.WriteLine("StartConnection");
         await _remoteConnect.ConnectToDevice();
 
     }
@@ -43,6 +43,7 @@ public class HandleConnect{
             return;
         }
 
+        Console.WriteLine("reconnect");
         // Create a new instance and initialize it
         _remoteConnect = new RemoteConnection(this.ip, this);
 

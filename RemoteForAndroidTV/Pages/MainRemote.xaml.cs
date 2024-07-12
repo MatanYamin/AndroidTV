@@ -4,42 +4,31 @@ using Microsoft.Maui.Controls;
 
 public partial class MainRemote : ContentPage{
 
-    readonly SendCommands _commands;
+    RemoteButtons _remote;
 
-    // HERE THE EVENT
-    public MainRemote(string ip){
+    public MainRemote(RemoteButtons remote){
 
         InitializeComponent();
-        this._commands = new SendCommands(ip);
 
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _commands.InitializeAsync();
+        _remote = remote;
     }
 
     private void OnBTN1(object sender, EventArgs e)
     {
-        _commands.TestChannelUpCommand();
+        _remote.TestChannelUpCommand();
 
     }
     private void OnBTN2(object sender, EventArgs e)
     {
-        // await _commands.test2();
-        _commands.TestVolumeCommand();
+         _remote.Digit1();
     }
 
-      private async void SwitchDevice(object sender, EventArgs e)
+    private async void SwitchDevice(object sender, EventArgs e)
     {
-        _commands.CleanRemote();
-
+        _remote.CleanRemote();
 
         await Navigation.PopToRootAsync();
-        // await Navigation.PopAsync();
 
-        // _enterCodePage.SwitchDevice();
     }
-
 
 }

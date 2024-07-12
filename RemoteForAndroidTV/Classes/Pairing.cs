@@ -11,14 +11,16 @@ using System.Runtime.CompilerServices;
 
 public class Pairing
 {
-    public delegate void NotifyEventHandler(object? sender, EventArgs e);
-    public static event NotifyEventHandler? ConnectionSuccessEvent, ConnectionLostEvent;
+    // public delegate void NotifyEventHandler(object? sender, EventArgs e);
+    // public static event NotifyEventHandler? ConnectionSuccessEvent, ConnectionLostEvent;
     private static SslStream? sslStream = default!;
     private static TcpClient? client = default!;
     const int PAIRING_PORT = 6467;
     private readonly string SERVER_IP;
+    HandlePairing _pairinghandler;
 
-    public Pairing(string ip){
+    public Pairing(string ip, HandlePairing hp){
+        _pairinghandler = hp;
         this.SERVER_IP = ip;
     }
 
@@ -244,7 +246,7 @@ public class Pairing
         return true; // For now, we accept any server certificate
     }
 
-    public async Task ConnectWithCode(string tvCode)
+    public async Task<bool> ConnectWithCode(string tvCode)
     {
         try
         {
@@ -259,11 +261,13 @@ public class Pairing
 
             CloseConnection();
 
+            return true;
 
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception in ConnectWithCode: {ex.Message}");
+            return false;
         }
     }
 
@@ -327,7 +331,7 @@ public class Pairing
 
     }
 
-        public static async Task<byte[]?> ReadMessageAsync(Stream networkStream, int messageLen)
+        public async Task<byte[]?> ReadMessageAsync(Stream networkStream, int messageLen)
         { 
         
             byte[] message = new byte[messageLen];
@@ -344,7 +348,7 @@ public class Pairing
 
         }
 
-        private static async Task<byte[]?> ReadServerMessages(Stream networkStream)
+        private async Task<byte[]?> ReadServerMessages(Stream networkStream)
         {
 
             byte[]? firstServerMessage = await ReadMessageAsync(networkStream, 1);
@@ -355,19 +359,19 @@ public class Pairing
             return secondMessage;
     }
 
-     private static void NotifyConnectionLost()
+     private void NotifyConnectionLost()
     {
         CloseConnection();
-        ConnectionLostEvent?.Invoke(null, EventArgs.Empty);
+        _pairinghandler.ConnectionFailed();
     }
 
-    private static void NotifyConnectionSuccess()
-    {
-        ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
-    }
+    // private static void NotifyConnectionSuccess()
+    // {
+    //     ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
+    // }
 
     
-        private static void VerifyResult(byte[]? response)
+        private void VerifyResult(byte[]? response)
         {
             if (response == null){
                 NotifyConnectionLost();

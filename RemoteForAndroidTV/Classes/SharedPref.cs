@@ -68,4 +68,8 @@ public static class SharedPref
 
     }
 
+    public static bool DidConnectedWithIP(string ip){
+        return Preferences.ContainsKey(ip);
+    }
+
 }

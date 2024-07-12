@@ -17,8 +17,8 @@ public class RemoteConnection
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
     private bool _isProcessingQueue = false;
     private readonly object _queueLock = new object();
-    public delegate void NotifyEventHandler(object? sender, EventArgs e);
-    public static event NotifyEventHandler ConnectionSuccessEvent, ConnectionLostEvent;
+    // public delegate void NotifyEventHandler(object? sender, EventArgs e);
+    // public static event NotifyEventHandler ConnectionSuccessEvent, ConnectionLostEvent;
 
     private static IValues PLATFORM_VALUES = default!;
     private static SslStream? _sslStream = default!;
@@ -27,18 +27,15 @@ public class RemoteConnection
     private readonly string SERVER_IP;
     private CancellationTokenSource _pingCancellationTokenSource = default!;
     private Task? _listeningTask = null;
-    SendCommands _sendCommands;
+    // SendCommands _sendCommands;
+    HandleConnect _connectHandler;
 
-    public RemoteConnection(string ip, SendCommands sc)
+    public RemoteConnection(string ip, HandleConnect hc)
     {
-        _sendCommands = sc;
+        // _sendCommands = sc;
+        _connectHandler = hc;
         this.SERVER_IP = ip;
         AssignPlatformValues();
-    }
-
-    public async Task InitializeConnectionAsync()
-    {
-        await ConnectToDevice();
     }
 
     private void AssignPlatformValues()
@@ -59,17 +56,19 @@ public class RemoteConnection
     {
         try
         {
+                    Console.WriteLine("ConnectToDevice");
+
             X509Certificate2 clientCertificate = await Task.Run(() => 
             {
                 return new X509Certificate2(SharedPref.LoadClientCertificate(this.SERVER_IP));
             });
-
+            Console.WriteLine("1");
             _client = new TcpClient();
             await _client.ConnectAsync(SERVER_IP, SEND_COMMANDS_PORT);
-
+Console.WriteLine("2");
             _sslStream = new SslStream(_client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate));
             await _sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509Certificate2Collection(clientCertificate), false);
-
+Console.WriteLine("3");
             await ReadServerMessage();
 
             byte[] configMess = buildConfigMess();
@@ -84,7 +83,7 @@ public class RemoteConnection
             }
 
             _ = StartListeningForPings();
-
+Console.WriteLine("4");
             NotifyConnectionSuccess();
 
         }
@@ -298,13 +297,16 @@ public class RemoteConnection
 
     public void NotifyConnectionLost()
     {
-        SharedPref.RemoveKey(this.SERVER_IP);
-        ConnectionLostEvent?.Invoke(null, EventArgs.Empty);
+        // SharedPref.RemoveKey(this.SERVER_IP);
+        // ConnectionLostEvent?.Invoke(null, EventArgs.Empty);
+        _connectHandler.ConnectionFailed();
     }
 
     private void NotifyConnectionSuccess()
     {
-        ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
+        Console.WriteLine("successsssss");
+        _connectHandler.ConnectionSuccess();
+        // ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
     }
 
     private async Task CloseConnectionAsync()
@@ -523,7 +525,7 @@ Console.WriteLine("9");
         if(++attempsForRecconecting > maxAttemps){
             reconnect = false;
         }
-       await _sendCommands.ReinitializeConnectionAsync(reconnect, command);
+       await _connectHandler.ReinitializeConnectionAsync(reconnect, command);
     }
 
 }

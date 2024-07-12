@@ -6,15 +6,18 @@ using Foundation;
 
 public class iOSValues : IValues
 {
+    string _serviceType = "_androidtvremote2._tcp.";
+    string _packageName = NSBundle.MainBundle.BundleIdentifier;
 
+    
     public string PackageName()
     {
-        return Foundation.NSBundle.MainBundle.BundleIdentifier;
+        return _packageName;
     }
 
     public string ServiceType()
     {
-        return "_androidtvremote2._tcp.";
+        return _serviceType;
     }
 
     public bool IsConnectedToInternet()
@@ -23,7 +26,7 @@ public class iOSValues : IValues
         return current == NetworkAccess.Internet;
     }
 
-public byte GetVersionCode()
+    public byte GetVersionCode()
     {
         var versionCode = NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
         int asciiValueSum = 0;

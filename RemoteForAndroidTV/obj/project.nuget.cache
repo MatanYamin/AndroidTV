@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "937+TEbZsDU=",
+  "dgSpecHash": "Jl4e8w05ycM=",
   "success": true,
   "projectFilePath": "/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/RemoteForAndroidTV.csproj",
   "expectedPackageFiles": [
+    "/Users/matan/.nuget/packages/communitytoolkit.mvvm/8.2.2/communitytoolkit.mvvm.8.2.2.nupkg.sha512",
     "/Users/matan/.nuget/packages/googlegson/2.10.1.4/googlegson.2.10.1.4.nupkg.sha512",
     "/Users/matan/.nuget/packages/microsoft.extensions.configuration/8.0.0/microsoft.extensions.configuration.8.0.0.nupkg.sha512",
     "/Users/matan/.nuget/packages/microsoft.extensions.configuration.abstractions/8.0.0/microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RemoteForAndroidTV")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+87259ae8f80c961db5a6334dbf5f9a9cda4a05f4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+7d589933b43c183290a34b708869900b97cd3ceb")]
 [assembly: System.Reflection.AssemblyProductAttribute("RemoteForAndroidTV")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RemoteForAndroidTV")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,51 +1,20 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.LifecycleEvents;
-using System;
+﻿
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace RemoteForAndroidTV
 {
     public partial class App : Application
     {
-        private bool _alertDisplayed;
-
         public App()
         {
             InitializeComponent();
 
+            // Initiate this to start the internet checking in the background
+            _ = new AppInitializer();
+
             MainPage = new AppShell();
-
-            StartInternetCheck();
         }
-
-        private void StartInternetCheck()
-        {
-            Device.StartTimer(TimeSpan.FromSeconds(3), () =>
-            {
-                CheckInternetConnection();
-                return true; // True = Repeat again, False = Stop the timer
-            });
-        }
-
-        private async void CheckInternetConnection()
-        {
-            var isConnected = IsConnectedToInternet();
-            if (!isConnected && !_alertDisplayed)
-            {
-                _alertDisplayed = true;
-                await MainThread.InvokeOnMainThreadAsync(async () =>
-                {
-                    await Application.Current.MainPage.DisplayAlert("No Internet", "You are not connected to the internet", "OK");
-                    _alertDisplayed = false;
-                });
-            }
-        }
-
-        private bool IsConnectedToInternet()
-        {
-            var current = Connectivity.NetworkAccess;
-            return current == NetworkAccess.Internet;
-        }
-
+  
         protected override void OnStart()
         {
             base.OnStart();
@@ -55,10 +24,11 @@ namespace RemoteForAndroidTV
         {
             base.OnSleep();
         }
-
         protected override void OnResume()
         {
             base.OnResume();
+
+            // WeakReferenceMessenger.Default.Send(new AppEnteredForegroundMessage());
 
             // Notify when the app enters the foreground
             MessagingCenter.Send(this, "AppEnteredForeground");

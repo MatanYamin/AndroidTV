@@ -4,9 +4,9 @@
              x:Class="RemoteForAndroidTV.DiscoveryDevicesPage">
 
     <StackLayout Padding="10">
-        <Label x:Name="DiscoveryStatusLabel" Text="Discovery stopped" HorizontalOptions="Center" VerticalOptions="Center" />
-        <Button Text="Start Discovery" Clicked="OnStartDiscoveryClicked" />
-        <Button Text="Stop Discovery" Clicked="OnStopDiscoveryClicked" />
+        <!-- <Label x:Name="DiscoveryStatusLabel" Text="Discovery stopped" HorizontalOptions="Center" VerticalOptions="Center" /> -->
+        <!-- <Button Text="Start Discovery" Clicked="OnStartDiscoveryClicked" />
+        <Button Text="Stop Discovery" Clicked="OnStopDiscoveryClicked" /> -->
         <ListView x:Name="DevicesListView" ItemTapped="OnDeviceTapped">
             <ListView.ItemTemplate>
                 <DataTemplate>

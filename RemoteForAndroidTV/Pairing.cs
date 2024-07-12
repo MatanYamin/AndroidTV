@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 public class Pairing
 {
     public delegate void NotifyEventHandler(object? sender, EventArgs e);
-    public static event NotifyEventHandler ConnectionSuccessEvent, ConnectionLostEvent;
+    public static event NotifyEventHandler? ConnectionSuccessEvent, ConnectionLostEvent;
     private static SslStream? sslStream = default!;
     private static TcpClient? client = default!;
     const int PAIRING_PORT = 6467;

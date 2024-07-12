@@ -8,7 +8,7 @@ namespace RemoteForAndroidTV
     {
         IValues values = new AndroidValues();
         private const int RETRY_COUNT = 3; // Number of retries
-        private const int SEARCH_DURATION = 5000; // Duration for each search in milliseconds
+        private const int SEARCH_DURATION = 3000; // Duration for each search in milliseconds
         private ObservableCollection<DeviceInfo> devices;
         private CancellationTokenSource? _cancellationTokenSource;
         private bool isSearching;
@@ -128,6 +128,14 @@ namespace RemoteForAndroidTV
             isSearching = false;
             _cancellationTokenSource?.Cancel();
             return Task.CompletedTask;
+        }
+
+        public void RedirectToSettings()
+        {
+            var intent = new Android.Content.Intent(Android.Provider.Settings.ActionApplicationDetailsSettings);
+            intent.AddFlags(Android.Content.ActivityFlags.NewTask);
+            intent.SetData(Android.Net.Uri.FromParts("package", Android.App.Application.Context.PackageName, null));
+            Android.App.Application.Context.StartActivity(intent);
         }
     }
 }

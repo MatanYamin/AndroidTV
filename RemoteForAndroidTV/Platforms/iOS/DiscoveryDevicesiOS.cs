@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Foundation;
 using Microsoft.Maui.Dispatching;
+using UIKit;
 
 namespace RemoteForAndroidTV
 {
@@ -27,6 +29,15 @@ namespace RemoteForAndroidTV
 
                 await Task.CompletedTask;
             };
+        }
+
+        public void RedirectToSettings()
+        {
+            var url = new NSUrl("app-settings:");
+            if (UIApplication.SharedApplication.CanOpenUrl(url))
+            {
+                UIApplication.SharedApplication.OpenUrl(url, new UIApplicationOpenUrlOptions(), null);
+            }
         }
 
         public async Task<bool> StartDevicesFindingAsync()

@@ -14,18 +14,8 @@
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/mauiimage.inputs
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/mauifont.inputs
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/mauisplash.inputs
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/drawable-hdpi/splash.png
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/drawable-mdpi/splash.png
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/drawable-v31/maui_splash_image.xml
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/drawable-xhdpi/splash.png
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/drawable-xxhdpi/splash.png
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/drawable-xxxhdpi/splash.png
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/drawable/maui_splash_image.xml
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/sp/values/maui_colors.xml
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/mauisplash.stamp
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/mauifont.stamp
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/f/OpenSans-Regular.ttf
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/f/OpenSans-Semibold.ttf
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/r/mipmap-xxxhdpi/appicon.png
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/r/mipmap-xxhdpi/appicon.png
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/r/mipmap-xhdpi/appicon.png
@@ -55,7 +45,6 @@
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/case_map.txt
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/__Microsoft.Android.Resource.Designer.cs
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/res.flag
-/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/503008DC1B4A3BC8-files.cache
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/resizetizer/C9B1CBF4695EDCBD-files.cache
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/lp/91/jl/files.cache
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/lp/92/jl/files.cache
@@ -133,6 +122,8 @@
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/arm64-v8a/System.Private.CoreLib.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/armeabi-v7a/System.Private.CoreLib.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/ca/Microsoft.Maui.Controls.resources.dll
+/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/CommunityToolkit.Mvvm.dll
+/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/CommunityToolkit.Mvvm.pdb
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/cs/Microsoft.Maui.Controls.resources.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/da/Microsoft.Maui.Controls.resources.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/obj/Debug/net8.0-android/android/assets/de/Microsoft.Maui.Controls.resources.dll

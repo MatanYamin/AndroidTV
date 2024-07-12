@@ -34,6 +34,7 @@
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/zh-Hans/Microsoft.Maui.Controls.resources.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/zh-Hant/Microsoft.Maui.Controls.resources.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/runtimeconfig.bin
+/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/CommunityToolkit.Mvvm.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/Microsoft.Extensions.Configuration.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/Microsoft.Extensions.Configuration.Abstractions.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/Microsoft.Extensions.DependencyInjection.dll

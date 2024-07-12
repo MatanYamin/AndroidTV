@@ -27,7 +27,7 @@ public class AppInitializer{
         });
     }
 
-    private bool IsConnectedToInternet()
+     bool IsConnectedToInternet()
     {
         var current = Connectivity.NetworkAccess;
         return current == NetworkAccess.Internet;

@@ -6,12 +6,10 @@ public partial class MainRemote : ContentPage{
 
     readonly SendCommands _commands;
 
-    EnterCodePage _enterCodePage;
     // HERE THE EVENT
-    public MainRemote(string ip, EnterCodePage ecp){
+    public MainRemote(string ip){
 
         InitializeComponent();
-        this._enterCodePage = ecp;
         this._commands = new SendCommands(ip);
 
     }

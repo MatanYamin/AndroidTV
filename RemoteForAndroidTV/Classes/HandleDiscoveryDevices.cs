@@ -26,7 +26,10 @@ public class HandleDiscoveryDevices{
 
         // When user returns to the app we get notified
         SubscribeToOnResume();
+
+        LastRemoteState();
     }
+
 
     private void AssignUiDevicesList(){
         _discoveryPage?.AssingUIDevices(Devices);
@@ -86,7 +89,7 @@ public class HandleDiscoveryDevices{
         }
     }
 
-    public void LastRemoteState(){
+    private void LastRemoteState(){
 
         string lastRemoteIp = SharedPref.GetLastRemoteIP();
         string lastRemoteName = SharedPref.GetLastRemoteName();
@@ -104,7 +107,7 @@ public class HandleDiscoveryDevices{
     private async void MoveToConnectionPage(DeviceInfo info){
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
-            await _discoveryPage.Navigation.PushAsync(new EnterCodePage(info));
+            await _discoveryPage.Navigation.PushAsync(new PairAndConnect(info));
         });
     }
     

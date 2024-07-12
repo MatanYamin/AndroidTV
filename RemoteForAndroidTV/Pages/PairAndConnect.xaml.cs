@@ -4,15 +4,14 @@ using System.Linq;
 namespace RemoteForAndroidTV
 {
       
-    public partial class EnterCodePage : ContentPage
+    public partial class PairAndConnect : ContentPage
     {
         Pairing _pairing;
         string ip, name;
-        MainRemote _remote = null;
-
-
+        MainRemote _remote;
         byte[]? _clientCertificate;
-        public EnterCodePage(DeviceInfo deviceInfo)
+
+        public PairAndConnect(DeviceInfo deviceInfo)
         {
 
             InitializeComponent();
@@ -22,7 +21,7 @@ namespace RemoteForAndroidTV
             this.ip = deviceInfo.IP;
             this.name = deviceInfo.Name;
 
-            _remote = new MainRemote(ip, this);
+            _remote = new MainRemote(ip);
 
             _clientCertificate = null;
 

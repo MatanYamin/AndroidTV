@@ -3,6 +3,7 @@ using SystemConfiguration;
 using CoreFoundation;
 using System.Net;
 using Foundation;
+using UIKit;
 
 public class iOSValues : IValues
 {
@@ -39,5 +40,38 @@ public class iOSValues : IValues
         return (byte)asciiValueSum;
     }
 
+        public void ShowKeyboard()
+        {
+            var window = UIApplication.SharedApplication.KeyWindow;
+            var view = window.RootViewController.View.FindFirstResponder();
+            if (view != null)
+            {
+                view.BecomeFirstResponder();
+            }
+        }
+
+
 }
+
+public static class UIViewExtensions
+    {
+        public static UIView FindFirstResponder(this UIView view)
+        {
+            if (view.IsFirstResponder)
+            {
+                return view;
+            }
+
+            foreach (var subView in view.Subviews)
+            {
+                var firstResponder = subView.FindFirstResponder();
+                if (firstResponder != null)
+                {
+                    return firstResponder;
+                }
+            }
+
+            return null;
+        }
+    }
     

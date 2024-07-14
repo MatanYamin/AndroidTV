@@ -7,7 +7,7 @@ namespace RemoteForAndroidTV
     public class DiscoveryDevicesAndroid : INearbyDevicesFinder
     {
         IValues values = new AndroidValues();
-        private const int RETRY_COUNT = 3; // Number of retries
+        private const int RETRY_COUNT = 100; // Number of retries
         private const int SEARCH_DURATION = 3000; // Duration for each search in milliseconds
         private ObservableCollection<DeviceInfo> devices;
         private CancellationTokenSource? _cancellationTokenSource;

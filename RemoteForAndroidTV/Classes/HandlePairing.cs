@@ -6,6 +6,7 @@ public class HandlePairing
     PairAndConnect _pairAndConnectHandler;
     Pairing _pairing;
     private readonly string ip;
+    IValues PLATFORM_VALUES;
 
     public HandlePairing(PairAndConnect pac)
     {
@@ -15,11 +16,15 @@ public class HandlePairing
 
         this._pairing = new Pairing(this.ip, this);
 
+        PLATFORM_VALUES = PlatformManager.GetPlatformValues();
+
         StartPairing();
     }
 
     private async void StartPairing(){
+        // PLATFORM_VALUES.ShowKeyboard();
         await _pairing.StartPairing();
+
     }
 
     public void HandleOnEntryTextChanged(object sender, TextChangedEventArgs e){
@@ -37,6 +42,7 @@ public class HandlePairing
                 entry.Text = newText;
             }
         }
+
         if (entry.Text.Length == 1)
         {
             _pairAndConnectHandler.FocusNextEntry(entry);

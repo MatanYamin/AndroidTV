@@ -24,7 +24,7 @@ namespace RemoteForAndroidTV
             };
         }
 
-         public async Task<bool> StartDiscoveryAsync(string serviceType)
+        public async Task<bool> StartDiscoveryAsync(string serviceType)
         {
             _tcs = new TaskCompletionSource<bool>();
             _serviceBrowser.SearchForServices(serviceType, "local.");

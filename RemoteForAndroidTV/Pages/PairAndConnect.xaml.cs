@@ -26,7 +26,6 @@ namespace RemoteForAndroidTV
             this.name = deviceInfo.Name;
 
         }
-
         protected override void OnAppearing()
         {
             base.OnAppearing();

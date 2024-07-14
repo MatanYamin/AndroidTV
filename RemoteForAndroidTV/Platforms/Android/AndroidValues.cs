@@ -1,5 +1,8 @@
 namespace RemoteForAndroidTV;
-
+using Android.Content;
+using Android.Views.InputMethods;
+using Microsoft.Maui.Controls;
+using RemoteForAndroidTV;
 
 public class AndroidValues : IValues
 {
@@ -34,6 +37,27 @@ public class AndroidValues : IValues
         }
 
         return (byte)asciiValueSum;
+    }
+
+    public void ShowKeyboard()
+    {
+        var context = Android.App.Application.Context;
+        var inputMethodManager = (InputMethodManager)context.GetSystemService(Context.InputMethodService);
+        var activity = Platform.CurrentActivity;
+        var token = activity.CurrentFocus?.WindowToken;
+
+        if (token != null)
+        {
+            inputMethodManager.ToggleSoftInput(ShowFlags.Forced, 0);
+        }
+        else
+        {
+            var view = new Android.Views.View(context);
+            view.LayoutParameters = new Android.Views.ViewGroup.LayoutParams(0, 0);
+            activity.AddContentView(view, view.LayoutParameters);
+            view.RequestFocus();
+            inputMethodManager.ShowSoftInput(view, ShowFlags.Forced);
+        }
     }
 
 }

@@ -7,7 +7,6 @@ public class HandleDiscoveryDevices{
     private INearbyDevicesFinder? _deviceFinder;
     private ObservableCollection<DeviceInfo> Devices { get; set; } = [];
     private readonly DiscoveryDevicesPage _discoveryPage = default!;
-
     public HandleDiscoveryDevices(DiscoveryDevicesPage discoveryPage){
         
         this._discoveryPage = discoveryPage;
@@ -48,11 +47,7 @@ public class HandleDiscoveryDevices{
     // Finds out which platform is for different search
     private void GetPlatform()
     {
-        #if IOS
-            _deviceFinder = new DiscoveryDevicesiOS(Devices);
-        #elif ANDROID
-            _deviceFinder = new DiscoveryDevicesAndroid(Devices);
-        #endif
+        _deviceFinder = PlatformManager.GetPlatformSearch(Devices);
     }
 
     private async void SearchDevices()

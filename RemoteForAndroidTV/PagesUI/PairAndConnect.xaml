@@ -24,34 +24,34 @@
         </Grid.Background>
 
         <!-- Content in the top -->
-        <StackLayout x:Name="UI1"  VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Padding="30,0" Spacing="10">
+        <StackLayout x:Name="UI1" FlowDirection="LeftToRight"  VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Padding="30,0" Spacing="10">
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="10">
-                <StackLayout>
+                <StackLayout FlowDirection="LeftToRight">
                     <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry1" />
                     <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
                 </StackLayout>
 
-                <StackLayout>
+                <StackLayout FlowDirection="LeftToRight">
                     <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry2" />
                     <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
                 </StackLayout>
 
-                <StackLayout>
+                <StackLayout FlowDirection="LeftToRight">
                     <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry3" />
                     <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
                 </StackLayout>
 
-                <StackLayout>
+                <StackLayout FlowDirection="LeftToRight">
                     <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry4" />
                     <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
                 </StackLayout>
 
-                <StackLayout>
+                <StackLayout FlowDirection="LeftToRight">
                     <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry5" />
                     <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
                 </StackLayout>
 
-                <StackLayout>
+                <StackLayout FlowDirection="LeftToRight">
                     <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry6" />
                     <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
                 </StackLayout>

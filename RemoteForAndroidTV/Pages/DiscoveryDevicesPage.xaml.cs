@@ -1,9 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-// #if IOS
-// using Foundation;
-// using UIKit;
-// #endif
+
 
 namespace RemoteForAndroidTV
 {

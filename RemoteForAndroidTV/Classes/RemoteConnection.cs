@@ -38,9 +38,6 @@ public class RemoteConnection
     public static event RemoteStateChanged? VolumeChangedEvent;
     public static event RemoteStateChanged? IsOnChangedEvent;
 
-
-    public static event EventHandler<string> matanb;
-
     public RemoteConnection(string ip, HandleConnect hc)
     {
         _connectHandler = hc;
@@ -50,11 +47,7 @@ public class RemoteConnection
 
     private void AssignPlatformValues()
     {
-        #if ANDROID
-        PLATFORM_VALUES = new AndroidValues();
-        #elif IOS
-        PLATFORM_VALUES = new iOSValues();
-        #endif
+        PLATFORM_VALUES = PlatformManager.GetPlatformValues();
     }
 
     private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)

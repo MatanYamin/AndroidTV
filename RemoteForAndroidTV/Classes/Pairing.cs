@@ -165,14 +165,12 @@ public class Pairing
             // Establish a TCP connection
             client = new TcpClient();
             await client.ConnectAsync(SERVER_IP, PAIRING_PORT);
-            Console.WriteLine("Successfully connected to the server.");
 
             // Create SSL stream
             sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate));
 
             // Authenticate the server and send the client certificate
             await sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509CertificateCollection() { clientCertificate }, false);
-            Console.WriteLine("Successfully AuthenticateAsClientAsync to the server.");
 
             // Send the first set of messages
             await SendServerMessage(Values.Pairing.FirstPayloadMessage);

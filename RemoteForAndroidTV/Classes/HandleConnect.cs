@@ -36,8 +36,8 @@ public class HandleConnect{
         _pairAndConnectHandler.ConnectionFailed();
     }
 
-    public void ConnectionSuccess(){
-        _pairAndConnectHandler.ConnectionSuccess(_remoteConnect);
+    public void ConnectionSuccess(RemoteState remoteState){
+        _pairAndConnectHandler.ConnectionSuccess(_remoteConnect, remoteState);
     }
 
     public async Task ReinitializeConnectionAsync(bool reConnect = true, byte[]? command = null)

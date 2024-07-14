@@ -9,6 +9,12 @@ using System.Text;
 using System.Reflection;
 using System.Collections.Concurrent;
 
+  public class RemoteState
+    {
+        public required string IsOn { get; set; }
+        public required string VolumeLevel { get; set; }
+    }
+
 public class RemoteConnection
 {
     int attempsForRecconecting;
@@ -23,6 +29,17 @@ public class RemoteConnection
     private CancellationTokenSource _pingCancellationTokenSource = default!;
     private Task? _listeningTask = null;
     HandleConnect _connectHandler;
+
+    private byte volState, isOnState = 1;
+
+
+    public delegate void RemoteStateChanged(string value);
+    // Define events
+    public static event RemoteStateChanged? VolumeChangedEvent;
+    public static event RemoteStateChanged? IsOnChangedEvent;
+
+
+    public static event EventHandler<string> matanb;
 
     public RemoteConnection(string ip, HandleConnect hc)
     {
@@ -74,13 +91,13 @@ public class RemoteConnection
 
             // Sending last payload
             await SendServerMessage(Values.RemoteConnect.SecondPayload);
-            await ReadServerMessage();
+            // await ReadServerMessage();
 
             // The server should send 3 messages
-            // for (int i = 0; i < 3; i++)
-            // {
-            //     await ReadServerMessage();
-            // }
+            for (int i = 0; i < 3; i++)
+            {
+                await ReadServerMessage();
+            }
 
             _ = StartListeningForPings();
 
@@ -105,18 +122,27 @@ public class RemoteConnection
       
     }
 
+    void PrintBuffer(byte[] buffer)
+    {
+        string result = "START BUFFER: [" + string.Join(", ", buffer) + "]";
+        Console.WriteLine(result);
+    }
+
     private async Task<byte[]?> ReadServerMessage()
     {
         if(!PLATFORM_VALUES.IsConnectedToInternet()){return null;}
 
         try
         {
-
-            byte[] buffer = new byte[100];
+            byte[] buffer = new byte[1];
             int bytesRead = await _sslStream.ReadAsync(buffer, 0, buffer.Length);
+            byte[] buffer2 = new byte[buffer[0]];
+            int bytesRead2 = await _sslStream.ReadAsync(buffer2, 0, buffer2.Length);
 
-            if (bytesRead > 0)
+            if (bytesRead2 > 0)
             {
+                HandleRemoteStateChangeServer(buffer2);
+                // PrintBuffer(buffer);
                 return buffer;
             }
             else
@@ -152,7 +178,7 @@ public class RemoteConnection
         }
     }
 
-    public void SendRemoteButton(byte[] command)
+    public async void SendRemoteButton(byte[] command)
     {
         if(!PLATFORM_VALUES.IsConnectedToInternet()){return;}
         
@@ -167,6 +193,7 @@ public class RemoteConnection
                 await _sslStream.WriteAsync(command, 0, command.Length);
 
                 await _sslStream.FlushAsync();
+
 
             }
             catch (IOException ex)
@@ -192,9 +219,9 @@ public class RemoteConnection
     {
         _pingCancellationTokenSource = new CancellationTokenSource();
         _listeningTask = ListenForPings(_pingCancellationTokenSource.Token);
+
         return _listeningTask;
     }
-
 
     private async Task ListenForPings(CancellationToken cancellationToken)
     {
@@ -226,16 +253,18 @@ public class RemoteConnection
     }
     private async Task WaitForPings(SslStream sslStream, CancellationToken cancellationToken)
     {
-        byte[] buffer = new byte[128];
+        byte[] sizeOfMEssageBuffer = new byte[1];
         try
         {
-            int bytesRead = await sslStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
-            if (bytesRead > 0)
+            int bytesRead = await sslStream.ReadAsync(sizeOfMEssageBuffer, 0, sizeOfMEssageBuffer.Length, cancellationToken);
+            byte[] messageFromServer = new byte[sizeOfMEssageBuffer[0]];
+            int bytesRead2 = await sslStream.ReadAsync(messageFromServer, 0, messageFromServer.Length, cancellationToken);
+            if (bytesRead2 > 0)
             {
-                byte firstByte = buffer[0];
-                byte secondByte = buffer[1];
 
-                if (firstByte == 66 || firstByte == 8 || secondByte == 66 || secondByte == 6)
+                byte firstByte = messageFromServer[0];
+                byte secondByte = messageFromServer[1];
+                if (firstByte == 66 || secondByte == 66 || firstByte == 8 || secondByte == 8)
                 {
                     if (!_isSendingPong)
                     {
@@ -255,8 +284,10 @@ public class RemoteConnection
                 }
                 else
                 {
+
+                    HandleRemoteStateChangeServer(messageFromServer);
                     // Handle other types of messages
-                    Console.WriteLine($"Received non-PING message: {Encoding.UTF8.GetString(buffer, 0, bytesRead)}");
+                    // Console.WriteLine($"Received non-PING message: {Encoding.UTF8.GetString(buffer, 0, bytesRead)}");
                 }
             }
             else
@@ -291,7 +322,20 @@ public class RemoteConnection
 
     private void NotifyConnectionSuccess()
     {
-        _connectHandler.ConnectionSuccess();
+        var remoteState = GetRemoteCurrentState();
+
+        _connectHandler.ConnectionSuccess(remoteState);
+    }
+
+    private RemoteState GetRemoteCurrentState(){
+
+        var remoteState = new RemoteState
+            {
+                IsOn = isOnState.ToString(),
+                VolumeLevel = volState.ToString()
+            };
+
+        return remoteState;
     }
 
     private void CloseConnectionAsync()
@@ -333,6 +377,7 @@ public class RemoteConnection
                 {
                     // Execute command
                     await operation();
+
                 }
                 catch (Exception ex)
                 {
@@ -483,6 +528,32 @@ public class RemoteConnection
             reconnect = false;
         }
        await _connectHandler.ReinitializeConnectionAsync(reconnect, command);
+    }
+
+
+  
+
+    void HandleRemoteStateChangeServer(byte[] stateBuffer){
+
+        byte firstByte = stateBuffer[0];
+
+        if(firstByte == 146){
+
+            byte tempVol = stateBuffer[stateBuffer.Length - 3];
+            if(tempVol == 0 && stateBuffer[stateBuffer.Length - 2] == 0){
+                return;
+            }
+            if(tempVol > 100 || tempVol < 0){return;}
+
+            volState = stateBuffer[stateBuffer.Length - 3];
+            VolumeChangedEvent?.Invoke(volState.ToString());
+
+        }
+        else if(firstByte == 194){
+            isOnState = stateBuffer[stateBuffer.Length-1];
+            IsOnChangedEvent?.Invoke(isOnState.ToString());
+        }
+
     }
 
 }

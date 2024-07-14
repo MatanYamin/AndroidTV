@@ -73,7 +73,7 @@ namespace RemoteForAndroidTV
             _pairingHandler?.HandleOnOkButtonClicked(sender, e);
         }
 
-        public async void ConnectionSuccess(RemoteConnection remote){
+        public async void ConnectionSuccess(RemoteConnection remote, RemoteState remoteState){
 
             SaveLastRemote();
 
@@ -82,7 +82,7 @@ namespace RemoteForAndroidTV
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                await Navigation.PushAsync(new MainRemote(_remoteButtons));
+                await Navigation.PushAsync(new MainRemote(_remoteButtons, remoteState));
             });
         }
 

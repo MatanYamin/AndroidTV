@@ -30,7 +30,7 @@ namespace RemoteForAndroidTV
         {
             base.OnAppearing();
             Device.BeginInvokeOnMainThread(() => {
-                Entry1.Focus();
+                SingleEntry.Focus();
             });
         }
 
@@ -40,32 +40,33 @@ namespace RemoteForAndroidTV
         }
 
         public int GetTVcodeCount(){
-            string enteredCode = $"{Entry1.Text}{Entry2.Text}{Entry3.Text}{Entry4.Text}{Entry5.Text}{Entry6.Text}";
+            string enteredCode = SingleEntry.Text;
             return enteredCode.Length;
         }
 
         public string GetTvCodeString(){
-            string enteredCode = $"{Entry1.Text}{Entry2.Text}{Entry3.Text}{Entry4.Text}{Entry5.Text}{Entry6.Text}";
+            // string enteredCode = $"{Entry1.Text}{Entry2.Text}{Entry3.Text}{Entry4.Text}{Entry5.Text}{Entry6.Text}";
+            string enteredCode = SingleEntry.Text;
             return enteredCode;
         }
 
-        public void FocusNextEntry(Entry currentEntry)
-        {
-            if (currentEntry == Entry1) Entry2.Focus();
-            else if (currentEntry == Entry2) Entry3.Focus();
-            else if (currentEntry == Entry3) Entry4.Focus();
-            else if (currentEntry == Entry4) Entry5.Focus();
-            else if (currentEntry == Entry5) Entry6.Focus();
-        }
+        // public void FocusNextEntry(Entry currentEntry)
+        // {
+        //     if (currentEntry == Entry1) Entry2.Focus();
+        //     else if (currentEntry == Entry2) Entry3.Focus();
+        //     else if (currentEntry == Entry3) Entry4.Focus();
+        //     else if (currentEntry == Entry4) Entry5.Focus();
+        //     else if (currentEntry == Entry5) Entry6.Focus();
+        // }
 
-        public void FocusPreviousEntry(Entry currentEntry)
-        {
-            if (currentEntry == Entry2) Entry1.Focus();
-            else if (currentEntry == Entry3) Entry2.Focus();
-            else if (currentEntry == Entry4) Entry3.Focus();
-            else if (currentEntry == Entry5) Entry4.Focus();
-            else if (currentEntry == Entry6) Entry5.Focus();
-        }
+        // public void FocusPreviousEntry(Entry currentEntry)
+        // {
+        //     if (currentEntry == Entry2) Entry1.Focus();
+        //     else if (currentEntry == Entry3) Entry2.Focus();
+        //     else if (currentEntry == Entry4) Entry3.Focus();
+        //     else if (currentEntry == Entry5) Entry4.Focus();
+        //     else if (currentEntry == Entry6) Entry5.Focus();
+        // }
 
         private void OnOkButtonClicked(object sender, EventArgs e)
         {

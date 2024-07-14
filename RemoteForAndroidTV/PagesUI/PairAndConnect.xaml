@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:RemoteForAndroidTV"
              x:Class="RemoteForAndroidTV.PairAndConnect"
              Background="Transparent">
     <ContentPage.Resources>
@@ -10,7 +11,7 @@
             <Setter Property="BackgroundColor" Value="Transparent" />
             <Setter Property="HorizontalTextAlignment" Value="Center" />
             <Setter Property="VerticalOptions" Value="CenterAndExpand" />
-            <Setter Property="WidthRequest" Value="50" />
+            <Setter Property="WidthRequest" Value="200" />
         </Style>
     </ContentPage.Resources>
 
@@ -23,52 +24,10 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <!-- Content in the top -->
-        <StackLayout x:Name="UI1" FlowDirection="LeftToRight"  VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Padding="30,0" Spacing="10">
-            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="10">
-                <StackLayout FlowDirection="LeftToRight">
-                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry1" />
-                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
-                </StackLayout>
-
-                <StackLayout FlowDirection="LeftToRight">
-                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry2" />
-                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
-                </StackLayout>
-
-                <StackLayout FlowDirection="LeftToRight">
-                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry3" />
-                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
-                </StackLayout>
-
-                <StackLayout FlowDirection="LeftToRight">
-                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry4" />
-                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
-                </StackLayout>
-
-                <StackLayout FlowDirection="LeftToRight">
-                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry5" />
-                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
-                </StackLayout>
-
-                <StackLayout FlowDirection="LeftToRight">
-                    <Entry Style="{StaticResource LineEntryStyle}" MaxLength="1" TextChanged="OnEntryTextChanged" x:Name="Entry6" />
-                    <BoxView HeightRequest="2" WidthRequest="50" Color="#D8BFD8" VerticalOptions="End" />
-                </StackLayout>
-            </StackLayout>
-
+        <!-- Single Input Text Field -->
+        <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+            <Entry Style="{StaticResource LineEntryStyle}" x:Name="SingleEntry" Placeholder="Enter text" TextChanged="OnEntryTextChanged" />
             <Button Text="OK" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnOkButtonClicked"/>
         </StackLayout>
-
-        <StackLayout x:Name="UI2" IsVisible="False">
-        <!-- Your second UI controls here -->
-        <StackLayout Orientation="Vertical" HorizontalOptions="Center" Spacing="10">
-        <Label Text="LOADING" />
-        <Label Text="LOADING" />
-        <Label Text="LOADING" />
-
-        </StackLayout>
-        <!-- Add more controls as needed -->
-    </StackLayout>
     </Grid>
 </ContentPage>

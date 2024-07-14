@@ -30,27 +30,25 @@ public class HandlePairing
     public void HandleOnEntryTextChanged(object sender, TextChangedEventArgs e){
 
         var entry = sender as Entry;
+        if (entry == null) return;
 
         // Filter out any non-letter and non-digit characters
         if (!string.IsNullOrEmpty(entry.Text))
         {
-        
             string newText = new string(entry.Text.Where(char.IsLetterOrDigit).ToArray()).ToUpper();
 
+            // Enforce max length of 6 characters
+            if (newText.Length > 6)
+            {
+                newText = newText.Substring(0, 6);
+            }
+
+            // Update the text if it has changed
             if (entry.Text != newText)
             {
                 entry.Text = newText;
             }
-        }
-
-        if (entry.Text.Length == 1)
-        {
-            _pairAndConnectHandler.FocusNextEntry(entry);
-        }
-
-        else if (string.IsNullOrEmpty(entry.Text))
-        {
-            _pairAndConnectHandler.FocusPreviousEntry(entry);
+       
         }
     }
 

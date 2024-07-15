@@ -22,9 +22,9 @@ namespace RemoteForAndroidTV
                 // Ensure UI updates are on the main thread
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    if (!devices.Any(d => d.Name == name && d.IP == ip))
+                    if (!devices.Any(d => d.Name == name && d.IpAddress == ip))
                     {
-                        devices.Add(new DeviceInfo { Name = name, IP = ip });
+                        devices.Add(new DeviceInfo { Name = name, IpAddress = ip });
                     }
                 });
 

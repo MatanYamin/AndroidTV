@@ -22,7 +22,7 @@ namespace RemoteForAndroidTV
 
         void Init(DeviceInfo deviceInfo){
 
-            this.ip = deviceInfo.IP;
+            this.ip = deviceInfo.IpAddress;
             this.name = deviceInfo.Name;
 
         }
@@ -50,26 +50,9 @@ namespace RemoteForAndroidTV
             return enteredCode;
         }
 
-        // public void FocusNextEntry(Entry currentEntry)
-        // {
-        //     if (currentEntry == Entry1) Entry2.Focus();
-        //     else if (currentEntry == Entry2) Entry3.Focus();
-        //     else if (currentEntry == Entry3) Entry4.Focus();
-        //     else if (currentEntry == Entry4) Entry5.Focus();
-        //     else if (currentEntry == Entry5) Entry6.Focus();
-        // }
-
-        // public void FocusPreviousEntry(Entry currentEntry)
-        // {
-        //     if (currentEntry == Entry2) Entry1.Focus();
-        //     else if (currentEntry == Entry3) Entry2.Focus();
-        //     else if (currentEntry == Entry4) Entry3.Focus();
-        //     else if (currentEntry == Entry5) Entry4.Focus();
-        //     else if (currentEntry == Entry6) Entry5.Focus();
-        // }
-
         private void OnOkButtonClicked(object sender, EventArgs e)
         {
+            PopupOverlay.IsVisible = true;
             _pairingHandler?.HandleOnOkButtonClicked(sender, e);
         }
 
@@ -122,6 +105,7 @@ namespace RemoteForAndroidTV
                 return;
             }
             else{
+                var info = SharedPref.GetNickname(this.ip);
                 // This is to connect for controling the remote
                 StartConnecting();
             }
@@ -131,5 +115,16 @@ namespace RemoteForAndroidTV
 
             return SharedPref.DidConnectedWithIP(ip);
         }
+
+        private void OnPopupOkClicked(object sender, EventArgs e)
+        {
+            string input = PopupEntry.Text;
+            DisplayAlert("Input", $"You entered: {input}", "OK");
+            PopupOverlay.IsVisible = false;
+
+            SharedPref.SaveNickname(this.ip, input);
+
+        }
+
     }
 }

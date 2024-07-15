@@ -1,4 +1,6 @@
 
+using System.Text.Json;
+
 public static class SharedPref
 {
     static string LAST_REMOTE_IP = "LastRemoteIP";
@@ -6,17 +8,89 @@ public static class SharedPref
     static string TIMES_IN_APP = "TimesInApp";
     static string SERVER_CERT = "ServerCertificate";
 
-    public static void SaveClientCertificate(string ip, byte[] content)
+    // public static void SaveClientCertificate(string ip, byte[] content)
+    // {
+    //     string base64String = Convert.ToBase64String(content);
+    //     Preferences.Set(ip, base64String);
+    // }
+
+    public static void SaveClientCertificate(string ip, byte[] clientCertificate)
     {
-        string base64String = Convert.ToBase64String(content);
-        Preferences.Set(ip, base64String);
+        // Load existing data
+        string json = Preferences.Get(ip, string.Empty);
+        IpInfo ipInfo;
+
+        // Check if existing data is in JSON format
+        if (IsValidJson(json))
+        {
+            ipInfo = JsonSerializer.Deserialize<IpInfo>(json);
+        }
+        else
+        {
+            ipInfo = new IpInfo();
+        }
+
+        // Update client certificate
+        string base64String = Convert.ToBase64String(clientCertificate);
+        ipInfo.ClientCertificate = base64String;
+
+        // Save updated data
+        json = JsonSerializer.Serialize(ipInfo);
+        Preferences.Set(ip, json);
+    }
+
+    public static void SaveNickname(string ip, string nickname)
+    {
+        // Load existing data
+        string json = Preferences.Get(ip, string.Empty);
+        IpInfo ipInfo;
+
+        // Check if existing data is in JSON format
+        if (IsValidJson(json))
+        {
+            ipInfo = JsonSerializer.Deserialize<IpInfo>(json);
+        }
+        else
+        {
+            ipInfo = new IpInfo();
+        }
+
+        // Update nickname
+        ipInfo.Nickname = nickname;
+
+        // Save updated data
+        json = JsonSerializer.Serialize(ipInfo);
+        Preferences.Set(ip, json);
+    }
+
+    private static IpInfo? GetIpInfo(string ip)
+    {
+        string json = Preferences.Get(ip, string.Empty);
+        if (string.IsNullOrEmpty(json))
+        {
+            return null;
+        }
+
+        if (!IsValidJson(json))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<IpInfo>(json);
+    }
+
+    public static string? GetNickname(string ip)
+    {
+        var info = GetIpInfo(ip);
+        return info?.Nickname;
     }
 
     public static byte[]? LoadClientCertificate(string ip)
     {
-        string base64String = Preferences.Get(ip, string.Empty);
-        return string.IsNullOrEmpty(base64String) ? null : Convert.FromBase64String(base64String);
+        var info = GetIpInfo(ip);
+        return string.IsNullOrEmpty(info?.ClientCertificate) ? null : Convert.FromBase64String(info.ClientCertificate);
     }
+
     public static void SaveServerCertificate(string content)
     {
         Preferences.Set(SERVER_CERT, content);
@@ -25,6 +99,7 @@ public static class SharedPref
     {
         return Preferences.Get(SERVER_CERT, string.Empty);
     }
+
     // Removes a key (if exists)
     public static void RemoveKey(string key){
         Preferences.Remove(key);
@@ -72,4 +147,34 @@ public static class SharedPref
         return Preferences.ContainsKey(ip);
     }
 
+    private static bool IsValidJson(string strInput)
+    {
+        if (string.IsNullOrWhiteSpace(strInput)) return false;
+
+        strInput = strInput.Trim();
+        if ((strInput.StartsWith("{") && strInput.EndsWith("}")) || //For object
+            (strInput.StartsWith("[") && strInput.EndsWith("]")))   //For array
+        {
+            try
+            {
+                var obj = JsonDocument.Parse(strInput);
+                return true;
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+}
+
+public class IpInfo
+{
+    public string? ClientCertificate { get; set; }
+    public string? Nickname { get; set; }
 }

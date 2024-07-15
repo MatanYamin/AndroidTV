@@ -1,5 +1,6 @@
 namespace RemoteForAndroidTV;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 public class HandleDiscoveryDevices{
 
@@ -17,6 +18,8 @@ public class HandleDiscoveryDevices{
 
         AssignUiDevicesList();
         
+        Devices.CollectionChanged += OnDevicesCollectionChanged;
+
         // Assign current platform for later use
         GetPlatform();
 
@@ -29,6 +32,8 @@ public class HandleDiscoveryDevices{
         // If this remote connected, move to next page
         LastRemoteState();
     }
+
+    
 
     // The list that displayed on the UI
     private void AssignUiDevicesList(){
@@ -52,6 +57,7 @@ public class HandleDiscoveryDevices{
 
     private async void SearchDevices()
     {
+
 
         bool isPermissionGranted = await (_deviceFinder?.StartDevicesFindingAsync() ?? Task.FromResult(false));
 
@@ -93,7 +99,7 @@ public class HandleDiscoveryDevices{
         // If Exists than move to the connection part
         if (!string.IsNullOrEmpty(lastRemoteIp))
         {
-            var info = new DeviceInfo { Name = lastRemoteName, IP = lastRemoteIp };
+            var info = new DeviceInfo { Name = lastRemoteName, IpAddress = lastRemoteIp };
             MoveToConnectionPage(info);
             return;
         }
@@ -105,6 +111,33 @@ public class HandleDiscoveryDevices{
         {
             await _discoveryPage.Navigation.PushAsync(new PairAndConnect(info));
         });
+    }
+
+     // Event handler for CollectionChanged event
+    private void OnDevicesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Add)
+        {
+            foreach (DeviceInfo newItem in e.NewItems)
+            {
+                // Handle the added item(s)
+                HandleExistingIP(newItem);
+                // Your logic here
+            }
+        }
+    }
+
+    void HandleExistingIP(DeviceInfo item){
+
+
+        var exist = SharedPref.DidConnectedWithIP(item.IpAddress);
+
+        if(!exist){return;}
+
+        var nickName = SharedPref.GetNickname(item.IpAddress);
+        if(!string.IsNullOrEmpty(nickName)){
+            item.Name = SharedPref.GetNickname(item.IpAddress);
+        }
     }
     
 }

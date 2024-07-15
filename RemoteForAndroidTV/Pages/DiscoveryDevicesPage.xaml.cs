@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 
@@ -22,11 +23,48 @@ namespace RemoteForAndroidTV
         {
             _handleDiscovery.ItemTapped(e);
         }
+
+
     }
 
-    public class DeviceInfo
+  public class DeviceInfo : INotifyPropertyChanged
+{
+    private string name;
+    private string ipAddress;
+
+    public string Name
     {
-        public required string Name { get; set; }
-        public required string IP { get; set; }
+        get => name;
+        set
+        {
+            if (name != value)
+            {
+                name = value;
+                OnPropertyChanged(nameof(Name));
+            }
+        }
     }
+
+    public string IpAddress
+    {
+        get => ipAddress;
+        set
+        {
+            if (ipAddress != value)
+            {
+                ipAddress = value;
+                OnPropertyChanged(nameof(IpAddress));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+
 }

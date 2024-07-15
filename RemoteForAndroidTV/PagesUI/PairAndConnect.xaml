@@ -29,5 +29,22 @@
             <Entry Style="{StaticResource LineEntryStyle}" x:Name="SingleEntry" Placeholder="Enter text" TextChanged="OnEntryTextChanged" />
             <Button Text="OK" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnOkButtonClicked"/>
         </StackLayout>
+
+        <!-- Popup Overlay -->
+        <Grid x:Name="PopupOverlay"
+              Opacity="0.9"
+              IsVisible="True">
+            <Grid VerticalOptions="Center"
+                  HorizontalOptions="Center"
+                  BackgroundColor="White"
+                  Padding="20"
+                  WidthRequest="300"
+                  HeightRequest="200">
+                <StackLayout>
+                    <Entry x:Name="PopupEntry" Placeholder="Enter something..."/>
+                    <Button Text="OK" Clicked="OnPopupOkClicked"/>
+                </StackLayout>
+            </Grid>
+        </Grid>
     </Grid>
 </ContentPage>

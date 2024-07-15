@@ -9,7 +9,7 @@ namespace RemoteForAndroidTV
         HandlePairing? _pairingHandler;
         HandleConnect? _connectHandler;
         RemoteButtons? _remoteButtons;
-        public string? ip, name;
+        public DeviceInfo? _device;
 
         public PairAndConnect(DeviceInfo deviceInfo)
         {
@@ -22,8 +22,7 @@ namespace RemoteForAndroidTV
 
         void Init(DeviceInfo deviceInfo){
 
-            this.ip = deviceInfo.IpAddress;
-            this.name = deviceInfo.Name;
+            this._device = deviceInfo;
 
         }
         protected override void OnAppearing()
@@ -52,7 +51,7 @@ namespace RemoteForAndroidTV
 
         private void OnOkButtonClicked(object sender, EventArgs e)
         {
-            PopupOverlay.IsVisible = true;
+            // PopupOverlay.IsVisible = true;
             _pairingHandler?.HandleOnOkButtonClicked(sender, e);
         }
 
@@ -71,7 +70,9 @@ namespace RemoteForAndroidTV
 
         public async void ConnectionFailed()
         {
+            Console.WriteLine("CUNT GO BACK FROM DISCONNECTED");
             RemoveKeyFromSave();
+
             // Ensure navigation happens on the main thread
             await MainThread.InvokeOnMainThreadAsync( () =>
             {
@@ -80,11 +81,11 @@ namespace RemoteForAndroidTV
         }
 
         void SaveLastRemote(){
-            SharedPref.SaveLastRemote(this.ip, this.name);
+            SharedPref.SaveLastRemote(this._device.IpAddress, this._device.Name);
         }
 
         public void RemoveKeyFromSave(){
-            SharedPref.RemoveKey(this.ip);
+            SharedPref.RemoveKey(this._device.IpAddress);
         }
 
         private void StartPairing(){
@@ -97,7 +98,7 @@ namespace RemoteForAndroidTV
 
         void HandleLastRemoteConnect(){
 
-            bool didConnect = DidConnectedBefore(this.ip);
+            bool didConnect = DidConnectedBefore(this._device.IpAddress);
 
             if(!didConnect){
                 // This is the proccess from scratch
@@ -105,7 +106,6 @@ namespace RemoteForAndroidTV
                 return;
             }
             else{
-                var info = SharedPref.GetNickname(this.ip);
                 // This is to connect for controling the remote
                 StartConnecting();
             }
@@ -122,8 +122,13 @@ namespace RemoteForAndroidTV
             DisplayAlert("Input", $"You entered: {input}", "OK");
             PopupOverlay.IsVisible = false;
 
-            SharedPref.SaveNickname(this.ip, input);
+            SharedPref.SaveNickname(this._device.IpAddress, input);
+            ChangeNicknameInList(input);
 
+        }
+
+        void ChangeNicknameInList(string nickName){
+            _device.Name = nickName;
         }
 
     }

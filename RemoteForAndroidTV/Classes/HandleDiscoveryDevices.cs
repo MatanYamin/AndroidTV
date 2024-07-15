@@ -136,7 +136,7 @@ public class HandleDiscoveryDevices{
 
         var nickName = SharedPref.GetNickname(item.IpAddress);
         if(!string.IsNullOrEmpty(nickName)){
-            item.Name = SharedPref.GetNickname(item.IpAddress);
+            item.Name = nickName;
         }
     }
     

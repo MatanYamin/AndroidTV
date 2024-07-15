@@ -12,7 +12,7 @@ public class HandlePairing
     {
 
         this._pairAndConnectHandler = pac;
-        this.ip = pac.ip;
+        this.ip = pac._device.IpAddress;
 
         this._pairing = new Pairing(this.ip, this);
 

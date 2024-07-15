@@ -65,9 +65,9 @@ namespace RemoteForAndroidTV
                         var ipAddress = resp.IPAddresses.FirstOrDefault(); // Get the first IP address
                         if (!string.IsNullOrEmpty(ipAddress))
                         {
-                            if (!devices.Any(d => d.Name == resp.DisplayName && d.IP == ipAddress))
+                            if (!devices.Any(d => d.Name == resp.DisplayName && d.IpAddress == ipAddress))
                             {
-                                devices.Add(new DeviceInfo { Name = resp.DisplayName, IP = ipAddress });
+                                devices.Add(new DeviceInfo { Name = resp.DisplayName, IpAddress = ipAddress });
                             }
                         }
                         else

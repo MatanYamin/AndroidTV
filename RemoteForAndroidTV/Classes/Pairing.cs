@@ -119,7 +119,7 @@ public class Pairing
         }
     }
 
-    private static void CloseConnection()
+    public void CloseConnection()
     {
         try
         {
@@ -216,7 +216,7 @@ public class Pairing
         }
     }
 
-    private static async Task SendServerMessage(byte[] message)
+    private async Task SendServerMessage(byte[] message)
     {
         try
         {

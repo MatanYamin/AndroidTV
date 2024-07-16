@@ -5,24 +5,26 @@ public class HandlePairing
 {
     PairAndConnect _pairAndConnectHandler;
     Pairing _pairing;
-    private readonly string ip;
-    IValues PLATFORM_VALUES;
+    private string ip;
 
     public HandlePairing(PairAndConnect pac)
     {
+        Init(pac);
+        StartPairing();
+    }
+
+    void Init(PairAndConnect pac){
 
         this._pairAndConnectHandler = pac;
         this.ip = pac._device.IpAddress;
 
+        CloseConnectino();
+        
         this._pairing = new Pairing(this.ip, this);
 
-        PLATFORM_VALUES = PlatformManager.GetPlatformValues();
-
-        StartPairing();
     }
 
     private async void StartPairing(){
-        // PLATFORM_VALUES.ShowKeyboard();
         await _pairing.StartPairing();
 
     }
@@ -86,6 +88,12 @@ public class HandlePairing
 
         _pairAndConnectHandler.ConnectionFailed();
 
+    }
+
+    public void CloseConnectino(){
+        if(_pairing != null){
+            _pairing.CloseConnection();
+        }
     }
 
 }

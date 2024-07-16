@@ -21,16 +21,20 @@ namespace RemoteForAndroidTV
         }
 
         void Init(DeviceInfo deviceInfo){
-
             this._device = deviceInfo;
 
+            // if there was a pairing process before
+            if(_pairingHandler != null){
+                _pairingHandler.CloseConnectino();
+            }
         }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            Device.BeginInvokeOnMainThread(() => {
-                SingleEntry.Focus();
-            });
+            // Device.BeginInvokeOnMainThread(() => {
+            //     SingleEntry.Focus();
+            // });
         }
 
         private void OnEntryTextChanged(object sender, TextChangedEventArgs e)
@@ -70,7 +74,6 @@ namespace RemoteForAndroidTV
 
         public async void ConnectionFailed()
         {
-            Console.WriteLine("CUNT GO BACK FROM DISCONNECTED");
             RemoveKeyFromSave();
 
             // Ensure navigation happens on the main thread
@@ -81,7 +84,7 @@ namespace RemoteForAndroidTV
         }
 
         void SaveLastRemote(){
-            SharedPref.SaveLastRemote(this._device.IpAddress, this._device.Name);
+            SharedPref.ConnectedSuccess(this._device.IpAddress, this._device.Name);
         }
 
         public void RemoveKeyFromSave(){

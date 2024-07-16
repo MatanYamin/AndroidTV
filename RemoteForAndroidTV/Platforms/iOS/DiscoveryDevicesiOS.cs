@@ -41,22 +41,27 @@ namespace RemoteForAndroidTV
             }
         }
 
+        // public async Task<bool> StartDevicesFindingAsync()
+        // {
+
+        //     for (int i = 0; i < repetitions; i++)
+        //     {
+        //         bool result = await StartDevicesFindingAsync2();
+        //         Console.WriteLine($"Discovery attempt {i + 1} {(result ? "succeeded" : "failed")}");
+        //         await Task.Delay(delayBetweenSearches);
+
+        //         // Optionally, you might want to stop the discovery before starting it again
+        //         await StopDevicesFindingAsync();
+        //     }
+        //     return true;
+        // }
+
+        // private async Task<bool> StartDevicesFindingAsync2()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
         public async Task<bool> StartDevicesFindingAsync()
-        {
-
-            for (int i = 0; i < repetitions; i++)
-            {
-                bool result = await StartDevicesFindingAsync2();
-                Console.WriteLine($"Discovery attempt {i + 1} {(result ? "succeeded" : "failed")}");
-                await Task.Delay(delayBetweenSearches);
-
-                // Optionally, you might want to stop the discovery before starting it again
-                await StopDevicesFindingAsync();
-            }
-            return true;
-        }
-
-        public async Task<bool> StartDevicesFindingAsync2()
         {
             return await bonjourServiceDiscovery.StartDiscoveryAsync(values.ServiceType());
         }

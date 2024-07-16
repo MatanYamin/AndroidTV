@@ -12,7 +12,9 @@ namespace RemoteForAndroidTV
         public DiscoveryDevicesPage()
         {
             InitializeComponent();
+            Console.WriteLine("CUNT 1");
             _handleDiscovery = new HandleDiscoveryDevices(this);
+            Console.WriteLine("CUNT 2");
         }
 
         public void AssingUIDevices(ObservableCollection<DeviceInfo> devices){

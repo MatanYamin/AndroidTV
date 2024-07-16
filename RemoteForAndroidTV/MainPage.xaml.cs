@@ -9,7 +9,6 @@ namespace RemoteForAndroidTV
             InitializeComponent();
 
             MoveToStartPage();
-
             
         }
 

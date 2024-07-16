@@ -8,14 +8,10 @@ public static class SharedPref
     static string TIMES_IN_APP = "TimesInApp";
     static string SERVER_CERT = "ServerCertificate";
 
-    // public static void SaveClientCertificate(string ip, byte[] content)
-    // {
-    //     string base64String = Convert.ToBase64String(content);
-    //     Preferences.Set(ip, base64String);
-    // }
 
     public static void SaveClientCertificate(string ip, byte[] clientCertificate)
     {
+
         // Load existing data
         string json = Preferences.Get(ip, string.Empty);
         IpInfo ipInfo;
@@ -82,6 +78,7 @@ public static class SharedPref
     public static string? GetNickname(string ip)
     {
         var info = GetIpInfo(ip);
+
         return info?.Nickname;
     }
 
@@ -118,10 +115,38 @@ public static class SharedPref
         return Preferences.Get(LAST_REMOTE_NAME, string.Empty);
     }
 
-    public static void SaveLastRemote(string ip, string name){
+    public static void ConnectedSuccess(string ip, string name){
+
+        
 
         SaveLastRemoteIP(ip);
         SaveLastRemoteName(name);
+        SaveConnectedSuccess(ip);
+    }
+
+    private static void SaveConnectedSuccess(string ip){
+
+        // Load existing data
+        string json = Preferences.Get(ip, string.Empty);
+        IpInfo ipInfo;
+
+        // Check if existing data is in JSON format
+        if (IsValidJson(json))
+        {
+            ipInfo = JsonSerializer.Deserialize<IpInfo>(json);
+        }
+        else
+        {
+            ipInfo = new IpInfo();
+        }
+
+        // Update nickname
+        ipInfo.DidConnect = true;
+
+        // Save updated data
+        json = JsonSerializer.Serialize(ipInfo);
+        Preferences.Set(ip, json);
+
     }
 
     public static int GetTimesInApp(){
@@ -138,13 +163,13 @@ public static class SharedPref
     }
 
     public static bool IsFirstTimeInApp(){
-
         return Preferences.Get(TIMES_IN_APP, 1) == 1;
-
     }
 
     public static bool DidConnectedWithIP(string ip){
-        return Preferences.ContainsKey(ip);
+        var info = GetIpInfo(ip);
+        if(info == null){return false;}
+        return info.DidConnect;
     }
 
     private static bool IsValidJson(string strInput)
@@ -177,4 +202,5 @@ public class IpInfo
 {
     public string? ClientCertificate { get; set; }
     public string? Nickname { get; set; }
+    public bool DidConnect { get; set; } = false;
 }

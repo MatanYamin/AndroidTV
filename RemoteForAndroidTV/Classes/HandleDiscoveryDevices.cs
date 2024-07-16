@@ -68,7 +68,7 @@ public class HandleDiscoveryDevices{
         else
         {
 
-            if(SharedPref.IsFirstTimeInApp() && ++countPermissionCheckTimes == 1){return;}
+            // if(SharedPref.IsFirstTimeInApp() && ++countPermissionCheckTimes == 1){return;}
 
             bool goToSettings = await _discoveryPage.DisplayAlert("Permission Denied", "Local network access is required to discover devices. Please enable it in settings.", "Go to Settings", "Cancel");
             if (goToSettings)

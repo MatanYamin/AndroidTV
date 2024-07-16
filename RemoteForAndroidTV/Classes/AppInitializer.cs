@@ -7,6 +7,7 @@ public class AppInitializer{
 
     public AppInitializer(){
         HandleInitFunctions();
+        
     }
 
     private void HandleInitFunctions(){

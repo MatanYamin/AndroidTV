@@ -3,17 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RemoteForAndroidTV.DiscoveryDevicesPage">
 
-    <StackLayout Padding="10">
-        <!-- <Label x:Name="DiscoveryStatusLabel" Text="Discovery stopped" HorizontalOptions="Center" VerticalOptions="Center" /> -->
-        <!-- <Button Text="Start Discovery" Clicked="OnStartDiscoveryClicked" />
-        <Button Text="Stop Discovery" Clicked="OnStopDiscoveryClicked" /> -->
-        <ListView x:Name="DevicesListView" ItemTapped="OnDeviceTapped">
+    <Grid Padding="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListView x:Name="DevicesListView" ItemTapped="OnDeviceTapped" Grid.Row="0">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextCell Text="{Binding Name}" />
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-    </StackLayout>
+
+        <Grid Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center">
+            <ActivityIndicator x:Name="DiscoveryIndicator" 
+                               IsRunning="True"
+                               IsVisible="True"
+                               WidthRequest="50"
+                               HeightRequest="50"
+                               Color="Blue"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"/>
+        </Grid>
+    </Grid>
 
 </ContentPage>

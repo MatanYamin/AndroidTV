@@ -1,13 +1,16 @@
 using System.Collections.ObjectModel;
 using Zeroconf;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace RemoteForAndroidTV
 {
     public class DiscoveryDevicesAndroid : INearbyDevicesFinder
     {
         IValues values = new AndroidValues();
-        private const int RETRY_COUNT = 100; // Number of retries
+        private const int RETRY_COUNT = 5; // Number of retries
         private const int SEARCH_DURATION = 3000; // Duration for each search in milliseconds
         private ObservableCollection<DeviceInfo> devices;
         private CancellationTokenSource? _cancellationTokenSource;
@@ -65,22 +68,24 @@ namespace RemoteForAndroidTV
                         var ipAddress = resp.IPAddresses.FirstOrDefault(); // Get the first IP address
                         if (!string.IsNullOrEmpty(ipAddress))
                         {
-                            if (!devices.Any(d => d.Name == resp.DisplayName && d.IpAddress == ipAddress))
+                            // Check if the device already exists in the collection
+                            var existingDevice = devices.FirstOrDefault(d => d.IpAddress == ipAddress);
+                            if (existingDevice == null)
                             {
+                                // Add the new device to the collection
                                 devices.Add(new DeviceInfo { Name = resp.DisplayName, IpAddress = ipAddress });
                             }
-                        }
-                        else
-                        {
                         }
                     }
                 }
             }
             catch (OperationCanceledException)
             {
+                // Handle cancellation
             }
             catch (Exception ex)
             {
+                // Handle other exceptions
             }
         }
 
@@ -97,9 +102,10 @@ namespace RemoteForAndroidTV
                 }
                 catch (OperationCanceledException)
                 {
+                    // Handle cancellation
                 }
 
-                await Task.Delay(5000); // Adjust the delay as needed
+                await Task.Delay(2500); // Adjust the delay as needed
             }
             return false; // If discovery is not successful
         }

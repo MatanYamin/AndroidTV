@@ -18,6 +18,7 @@ namespace RemoteForAndroidTV
             Init(deviceInfo);
 
             HandleLastRemoteConnect();
+
         }
 
         void Init(DeviceInfo deviceInfo){
@@ -61,6 +62,7 @@ namespace RemoteForAndroidTV
 
         public async void ConnectionSuccess(RemoteConnection remote, RemoteState remoteState){
 
+            HideLoading();
             SaveLastRemote();
 
             // create new instance of a remote buttons with the connection we just made
@@ -74,6 +76,7 @@ namespace RemoteForAndroidTV
 
         public async void ConnectionFailed()
         {
+            HideLoading();
             RemoveKeyFromSave();
 
             // Ensure navigation happens on the main thread
@@ -96,6 +99,7 @@ namespace RemoteForAndroidTV
         }
 
         public void StartConnecting(){
+            ShowLoading();
             _connectHandler = new HandleConnect(this);
         }
 
@@ -132,6 +136,17 @@ namespace RemoteForAndroidTV
 
         void ChangeNicknameInList(string nickName){
             _device.Name = nickName;
+        }
+
+        private void ShowLoading()
+        {
+            LoadingOverlay.IsVisible = true;
+
+        }
+
+        private void HideLoading()
+        {
+            LoadingOverlay.IsVisible = false;
         }
 
     }

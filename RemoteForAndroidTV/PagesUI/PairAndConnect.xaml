@@ -46,5 +46,16 @@
                 </StackLayout>
             </Grid>
         </Grid>
+
+        <!-- Loading Screen Overlay -->
+        <Grid x:Name="LoadingOverlay"
+              BackgroundColor="Black"
+              Opacity="0.8"
+              IsVisible="False">
+            <ActivityIndicator IsRunning="True"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"
+                               Color="White"/>
+        </Grid>
     </Grid>
 </ContentPage>

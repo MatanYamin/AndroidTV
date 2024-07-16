@@ -1,3 +1,5 @@
+/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/he/RemoteForAndroidTV.resources.dll
+/Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/in/RemoteForAndroidTV.resources.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/icudt.dat
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/ar/Microsoft.Maui.Controls.resources.dll
 /Users/matan/Desktop/GitHubAndroidTV/AndroidTV/RemoteForAndroidTV/bin/Debug/net8.0-ios/ios-arm64/publish/../RemoteForAndroidTV.app/ca/Microsoft.Maui.Controls.resources.dll

@@ -62,6 +62,7 @@ namespace RemoteForAndroidTV
 
         public async void ConnectionSuccess(RemoteConnection remote, RemoteState remoteState){
 
+            Console.WriteLine("CONNECTION YES!!");
             HideLoading();
             SaveLastRemote();
 
@@ -77,6 +78,7 @@ namespace RemoteForAndroidTV
         public async void ConnectionFailed()
         {
             HideLoading();
+
             RemoveKeyFromSave();
 
             // Ensure navigation happens on the main thread
@@ -86,11 +88,19 @@ namespace RemoteForAndroidTV
             });
         }
 
+        void test(){
+
+            SharedPref.test(this._device.IpAddress);
+
+        }
+
         void SaveLastRemote(){
             SharedPref.ConnectedSuccess(this._device.IpAddress, this._device.Name);
         }
 
         public void RemoveKeyFromSave(){
+            Console.WriteLine("Remove");
+            test();
             SharedPref.RemoveKey(this._device.IpAddress);
         }
 
@@ -107,6 +117,7 @@ namespace RemoteForAndroidTV
 
             bool didConnect = DidConnectedBefore(this._device.IpAddress);
 
+            Console.WriteLine("connected: " + didConnect);
             if(!didConnect){
                 // This is the proccess from scratch
                 StartPairing();

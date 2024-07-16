@@ -59,6 +59,31 @@ public static class SharedPref
         Preferences.Set(ip, json);
     }
 
+    public static void test(string ip){
+
+        // Load existing data
+        string json = Preferences.Get(ip, string.Empty);
+        IpInfo ipInfo;
+
+        // Check if existing data is in JSON format
+        if (IsValidJson(json))
+        {
+            ipInfo = JsonSerializer.Deserialize<IpInfo>(json);
+        }
+        else
+        {
+            ipInfo = new IpInfo();
+        }
+
+        // Update nickname
+        ipInfo.DidConnect = false;
+
+        // Save updated data
+        json = JsonSerializer.Serialize(ipInfo);
+        Preferences.Set(ip, json);
+
+    }
+
     private static IpInfo? GetIpInfo(string ip)
     {
         string json = Preferences.Get(ip, string.Empty);

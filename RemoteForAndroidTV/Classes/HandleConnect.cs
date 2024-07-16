@@ -26,10 +26,10 @@ public class HandleConnect{
     async public void ConnectionFailed(bool reconnect = false){
 
         // if we want to reconnect and the numbers of reconnections is allowed then try.
-        if(reconnect && ++_reconnectAttemps <= Values.RemoteConnect._maxAttempsToConnect){
-            await ReinitializeConnectionAsync(true, null);
-            return;
-        }
+        // if(reconnect && ++_reconnectAttemps <= Values.RemoteConnect._maxAttempsToConnect){
+        //     await ReinitializeConnectionAsync(true, null);
+        //     return;
+        // }
 
         // we dont want to reconnect, notify the page that connection failed.
         _reconnectAttemps = 0;
@@ -42,6 +42,7 @@ public class HandleConnect{
 
     public async Task ReinitializeConnectionAsync(bool reConnect = true, byte[]? command = null)
     {
+        // return;
         // Ensure the current connection is properly closed and disposed
         if (_remoteConnect != null)
         {

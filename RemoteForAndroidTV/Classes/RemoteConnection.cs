@@ -77,13 +77,14 @@ public class RemoteConnection
 
             // Sending the config message
             byte[] configMess = buildConfigMess();
-            await SendServerMessage(configMess);
-
+            bool answer = await SendServerMessage(configMess);
+            if(!answer){return;}
             // We should get a reponse from the server
             await ReadServerMessage();
 
             // Sending last payload
-            await SendServerMessage(Values.RemoteConnect.SecondPayload);
+            answer = await SendServerMessage(Values.RemoteConnect.SecondPayload);
+            if(!answer){return;}
             // await ReadServerMessage();
 
             // The server should send 3 messages
@@ -151,9 +152,9 @@ public class RemoteConnection
         }
     }
 
-    private async Task SendServerMessage(byte[] message)
+    private async Task<bool> SendServerMessage(byte[] message)
     {
-        if(!PLATFORM_VALUES.IsConnectedToInternet()){return;}
+        if(!PLATFORM_VALUES.IsConnectedToInternet()){return false;}
 
         byte[] messageLengthArray = [(byte)message.Length];
         try
@@ -163,11 +164,14 @@ public class RemoteConnection
             await _sslStream.WriteAsync(message, 0, message.Length);
 
             await _sslStream.FlushAsync();
+
+            return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception in SendServerMessage: {ex.Message}");
-            CloseConnectionAsync(); // Ensure connection cleanup on error
+            NotifyConnectionLost();
+
+            return false;
         }
     }
 

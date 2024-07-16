@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-
+using System.Globalization;
+using Microsoft.Maui.Controls;
+using Microsoft.VisualBasic;
 
 namespace RemoteForAndroidTV
 {
@@ -12,7 +14,7 @@ namespace RemoteForAndroidTV
         public DiscoveryDevicesPage()
         {
             InitializeComponent();
-
+ testLang();
             _handleDiscovery = new HandleDiscoveryDevices(this);
         }
 
@@ -23,6 +25,11 @@ namespace RemoteForAndroidTV
         private void OnDeviceTapped(object sender, ItemTappedEventArgs e)
         {
             _handleDiscovery.ItemTapped(e);
+        }
+
+        void testLang(){
+            string greeting = ResourceProvider.GetString("Hello");
+            Console.WriteLine(greeting);
         }
 
     }
@@ -65,6 +72,8 @@ namespace RemoteForAndroidTV
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
+
+
 
 
 }

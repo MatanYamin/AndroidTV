@@ -1,7 +1,9 @@
 namespace RemoteForAndroidTV;
 
 public class RemoteButtons{
+
     RemoteConnection _remote;
+
 
     public RemoteButtons(RemoteConnection rc){
         _remote = rc;
@@ -15,7 +17,7 @@ public class RemoteButtons{
     }
 
     public void IncreaseVolume(){
-
+        // test...
         byte[] m1press = [82, 4, 8, 24, 16, 1];
         _remote.SendRemoteButton(m1press);
         byte[] m2press = [82, 4, 8, 24, 16, 2];
@@ -23,6 +25,7 @@ public class RemoteButtons{
     }
 
     public void Digit1(){
+        // test...    
         byte[] m1press = [82, 5, 8, 8, 16, 1];
         byte[] m2press = [82, 4, 8, 8, 16, 2];
 
@@ -37,6 +40,10 @@ public class RemoteButtons{
             _remote.Dispose();
             _remote = null;
         }
+    }
+
+    public void OnResume(){
+        _remote.OnResume();
     }
 
 }

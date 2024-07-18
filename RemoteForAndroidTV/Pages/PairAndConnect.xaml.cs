@@ -35,7 +35,7 @@ namespace RemoteForAndroidTV
 
             // if there was a pairing process before
             if(_pairingHandler != null){
-                _pairingHandler.CloseConnectino();
+                _pairingHandler.CloseConnection();
             }
 
             // has nickname
@@ -104,9 +104,8 @@ namespace RemoteForAndroidTV
             PopupOverlay.IsVisible = show;
         }
 
-        public void ConnectionFailed()
+        public async void ConnectionFailed()
         {
-            Console.WriteLine("CONNEDTED FAILEDDDD");
 
             HideLoading();
 
@@ -114,6 +113,11 @@ namespace RemoteForAndroidTV
             RemoveLastRemote();
 
             ShowReconnectOverlay();
+
+            // if it was from the automaticly connecting to remote when entering app
+            if(_device.LastRemote){
+                BackToMain();
+            }
             // _mainRemote.ConnectionFailedShowReConnectButton();
             // await Navigation.PopAsync();
 
@@ -122,6 +126,13 @@ namespace RemoteForAndroidTV
             // {
             //     Navigation.PopToRootAsync();
             // });
+        }
+
+        async void BackToMain(){
+            await MainThread.InvokeOnMainThreadAsync( () =>
+                {
+                    Navigation.PopToRootAsync();
+                });
         }
 
         void SaveLastRemote(){
@@ -135,7 +146,6 @@ namespace RemoteForAndroidTV
         private void RemoveLastRemote(){
 
             SharedPref.RemoveLastRemote();
-
         }
 
         private void StartPairing(){
@@ -150,7 +160,7 @@ namespace RemoteForAndroidTV
         void HandleLastRemoteConnect(){
 
             bool didConnect = DidConnectedBefore(this._device.IpAddress);
-
+            
             if(!didConnect){
                 // This is the proccess from scratch
                 StartPairing();
@@ -213,6 +223,21 @@ namespace RemoteForAndroidTV
         {
             SingleEntry.Text = string.Empty;
             ReconnectOverlay.IsVisible = false;
+        }
+
+        public void OnBackToMain(object sender, EventArgs e){
+
+            if(_remoteButtons != null){
+                _remoteButtons.CleanRemote();
+            }
+            if(_pairingHandler != null){
+                _pairingHandler.CloseConnection();
+            }
+
+            RemoveLastRemote();
+
+            BackToMain();
+
         }
 
     }

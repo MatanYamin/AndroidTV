@@ -13,10 +13,13 @@ namespace RemoteForAndroidTV
 
         public DiscoveryDevicesPage()
         {
+
             InitializeComponent();
- testLang();
+
             _handleDiscovery = new HandleDiscoveryDevices(this);
+
         }
+        
 
         public void AssingUIDevices(ObservableCollection<DeviceInfo> devices){
             DevicesListView.ItemsSource = devices;
@@ -38,6 +41,7 @@ namespace RemoteForAndroidTV
 {
     private string name;
     private string ipAddress;
+    private bool lastRemote = false;
 
     public string Name
     {
@@ -65,6 +69,18 @@ namespace RemoteForAndroidTV
         }
     }
 
+    public bool LastRemote
+    {
+        get => lastRemote;
+        set
+        {
+            if (lastRemote != value)
+            {
+                lastRemote = value;
+            }
+        }
+    }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     protected void OnPropertyChanged(string propertyName)
@@ -72,8 +88,5 @@ namespace RemoteForAndroidTV
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
-
-
-
 
 }

@@ -14,7 +14,6 @@ public class HandleConnect{
         this.ip = pac._device.IpAddress;
 
         _remoteConnect = new RemoteConnection(this.ip, this);
-
         StartConnection();
     }
 

@@ -68,7 +68,7 @@ public class HandleDiscoveryDevices{
         else
         {
 
-            // if(SharedPref.IsFirstTimeInApp() && ++countPermissionCheckTimes == 1){return;}
+            if(SharedPref.IsFirstTimeInApp() && ++countPermissionCheckTimes == 1){return;}
 
             bool goToSettings = await _discoveryPage.DisplayAlert("Permission Denied", "Local network access is required to discover devices. Please enable it in settings.", "Go to Settings", "Cancel");
             if (goToSettings)
@@ -99,7 +99,7 @@ public class HandleDiscoveryDevices{
         // If Exists than move to the connection part
         if (!string.IsNullOrEmpty(lastRemoteIp) && IsConnectedBefore(lastRemoteIp))
         {
-            var info = new DeviceInfo { Name = lastRemoteName, IpAddress = lastRemoteIp };
+            var info = new DeviceInfo { Name = lastRemoteName, IpAddress = lastRemoteIp, LastRemote = true };
             MoveToConnectionPage(info);
             return;
         }

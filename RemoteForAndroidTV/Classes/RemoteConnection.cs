@@ -19,7 +19,7 @@ public class RemoteConnection
 {
     int attempsForRecconecting;
     const int SEND_COMMANDS_PORT = 6466;
-    private bool _disposed, _isSendingPong, _isProcessingQueue;
+    private bool _disposed, _isSendingPong, _isProcessingQueue, hasSubscribedToForegroundEvent;
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
     private readonly object _queueLock = new();
     private static IValues PLATFORM_VALUES = default!;
@@ -32,7 +32,6 @@ public class RemoteConnection
 
     private byte volState, isOnState = 1;
 
-
     public delegate void RemoteStateChanged(string value);
     // Define events
     public static event RemoteStateChanged? VolumeChangedEvent;
@@ -43,6 +42,7 @@ public class RemoteConnection
         _connectHandler = hc;
         this.SERVER_IP = ip;
         AssignPlatformValues();
+
     }
 
     private void AssignPlatformValues()
@@ -52,6 +52,7 @@ public class RemoteConnection
 
     private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
     {
+
         return true;
     }
 
@@ -316,6 +317,18 @@ public class RemoteConnection
         // }
     }
 
+    public async void OnResume(){
+
+        // check if connection still active
+        // if not, connect again
+        bool answer = await SendServerMessage(Values.RemoteConnect.Pong);
+
+        // connection still exists.
+        if(answer){return;}
+        ConnectionFailed(true, null);
+
+    }
+
     public void ConnectionFailed(bool reconnect = false, byte[]? command = null)
     {
         CloseConnection();
@@ -351,11 +364,7 @@ public class RemoteConnection
 
         var remoteState = GetRemoteCurrentState();
 
-
         _connectHandler.ConnectionSuccess(remoteState);
-
-       
-
 
     }
 
@@ -374,6 +383,7 @@ public class RemoteConnection
     {
         try
         {
+
             _pingCancellationTokenSource?.Cancel();
 
             if (_sslStream != null)

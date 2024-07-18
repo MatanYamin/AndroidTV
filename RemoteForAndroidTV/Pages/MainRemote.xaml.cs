@@ -1,7 +1,6 @@
 namespace RemoteForAndroidTV;
 using System;
 using Microsoft.Maui.Controls;
-using RemoteForAndroidTV;
 
 public partial class MainRemote : ContentPage{
 
@@ -18,6 +17,16 @@ public partial class MainRemote : ContentPage{
         SubscribeToEvents();
 
         InitValues(remoteStateInfo);
+    }
+
+    protected override void OnAppearing()
+    {
+        SubscribeToOnResume();
+    }
+    protected override void OnDisappearing()
+    {
+        UnSubscribeOnResume();
+
     }
 
     void InitValues(RemoteState remoteStateInfo){
@@ -47,7 +56,7 @@ public partial class MainRemote : ContentPage{
         await Navigation.PopToRootAsync();
     }
 
-    private async void IncreaseVolume(object sender, EventArgs e)
+    private void IncreaseVolume(object sender, EventArgs e)
     {
         _remote.IncreaseVolume();
     }
@@ -60,7 +69,7 @@ public partial class MainRemote : ContentPage{
 
     private void OnIsOnChanged(string isOnState)
     {
-        isRemoteOn = (isOnState == "1"); // if is 1 then its on
+        isRemoteOn = (isOnState == "1"); // if its 1 then its on
 
         if(!isRemoteOn){
             ChangeVol("");
@@ -106,6 +115,24 @@ public partial class MainRemote : ContentPage{
 
         await Navigation.PopAsync();
 
+    }
+
+    private void onResume(){
+        Console.WriteLine("resumed");
+        _remote.OnResume();
+    }
+
+    private void SubscribeToOnResume(){
+        Console.WriteLine("SUBSCRIBE RESUME");
+         MessagingCenter.Subscribe<App>(this, "AppEnteredForeground", (sender) =>
+            {
+                onResume();
+            });
+    }
+
+    private void UnSubscribeOnResume(){
+        Console.WriteLine("UNUNUNSUBSCRIBE RESUME");
+        MessagingCenter.Unsubscribe<App>(this, "AppEnteredForeground");
     }
 
 }

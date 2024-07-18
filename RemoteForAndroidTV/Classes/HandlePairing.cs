@@ -18,7 +18,7 @@ public class HandlePairing
         this._pairAndConnectHandler = pac;
         this.ip = pac._device.IpAddress;
 
-        CloseConnectino();
+        CloseConnection();
         
         this._pairing = new Pairing(this.ip, this);
 
@@ -90,7 +90,7 @@ public class HandlePairing
 
     }
 
-    public void CloseConnectino(){
+    public void CloseConnection(){
         if(_pairing != null){
             _pairing.CloseConnection();
         }

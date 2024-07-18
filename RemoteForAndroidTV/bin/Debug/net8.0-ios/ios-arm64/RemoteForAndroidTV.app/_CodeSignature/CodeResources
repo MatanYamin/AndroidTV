@@ -142,11 +142,11 @@
 		</data>
 		<key>RemoteForAndroidTV.dll</key>
 		<data>
-		uZOkv5RmdDDEO8iuw16zfbBuFlg=
+		+pRjW4PL8sUK58NXPKdcvHSirag=
 		</data>
 		<key>RemoteForAndroidTV.pdb</key>
 		<data>
-		H2tW6Y/X6UuRYL4nji7YLbzsDvA=
+		HH51A4noeSWxrmigpkZQBC3T8d4=
 		</data>
 		<key>Settings.bundle/Root.plist</key>
 		<data>
@@ -878,7 +878,7 @@
 		</data>
 		<key>he/RemoteForAndroidTV.resources.dll</key>
 		<data>
-		eyHOjBzCV0/1u9D71T0s3dXlKGs=
+		no5rRZRSbCMl7QbXj7ol0tB45dM=
 		</data>
 		<key>hi/Microsoft.Maui.Controls.resources.dll</key>
 		<data>
@@ -886,7 +886,7 @@
 		</data>
 		<key>hi/RemoteForAndroidTV.resources.dll</key>
 		<data>
-		drybOlrcRrHsajrYaRRYQsfwKSA=
+		bNP47n1KGZTim3Qq9DYETSK3TRY=
 		</data>
 		<key>hr/Microsoft.Maui.Controls.resources.dll</key>
 		<data>
@@ -1243,14 +1243,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			bTZAMq3HFJwDlc0zL9ZkA//L2BYyRoKATckT6ddNqms=
+			4y7nJPTxsA6H5u7YhfvjfLpJ7LNwvWOmEgQq94tijdk=
 			</data>
 		</dict>
 		<key>RemoteForAndroidTV.pdb</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			prjI+spGPIqRTY+EiiirRDokWYadoTsq7CDHG1L94QA=
+			ul1mWi3ZNupRDGIdEWuMZDnrUp9uoKYWV6fFXwPqvCs=
 			</data>
 		</dict>
 		<key>Settings.bundle/Root.plist</key>
@@ -2531,7 +2531,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			kH4OxEQlNBqzLx9AWzT5AZFHDKNZQy0XLmDnkA+2Tiw=
+			oTbcbW6F8liVKJ96L1gIgNwDb+WmXnNKzlZlJyVC4Jo=
 			</data>
 		</dict>
 		<key>hi/Microsoft.Maui.Controls.resources.dll</key>
@@ -2545,7 +2545,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			/zOpaLFpYIY9AgMTRciruTVFLlOPScgkZiSiW8GXjwo=
+			W1fIQakvN/F6OQL3/v2aqiBK2N604EmfWWYm5zrN8IE=
 			</data>
 		</dict>
 		<key>hr/Microsoft.Maui.Controls.resources.dll</key>

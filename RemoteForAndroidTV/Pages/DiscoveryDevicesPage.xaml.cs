@@ -15,6 +15,10 @@ namespace RemoteForAndroidTV
         {
 
             InitializeComponent();
+            Console.WriteLine("MATAN YAMIN");
+             Console.WriteLine("MATAN YAMIN");
+              Console.WriteLine("MATAN YAMIN");
+               Console.WriteLine("MATAN YAMIN");
 testLang();
             // Handle discovery
             _handleDiscovery = new HandleDiscoveryDevices(this);

@@ -22,7 +22,7 @@ public static class Values
         public static byte[] SecondPayload => _secondPayload;
         private static readonly byte[] _pong = [74, 2, 8, 25];
         public static byte[] Pong => _pong;
-        public static readonly int _maxAttempsToConnect = 2;
+        public static readonly int _maxAttempsToConnect = 1;
         public static readonly int _checkinternetConnectionEvery = 3; // in seconds
 
     }

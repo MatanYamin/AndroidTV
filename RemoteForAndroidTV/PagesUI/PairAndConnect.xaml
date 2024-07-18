@@ -33,7 +33,7 @@
         <!-- Popup Overlay -->
         <Grid x:Name="PopupOverlay"
               Opacity="0.9"
-              IsVisible="True">
+              IsVisible="False">
             <Grid VerticalOptions="Center"
                   HorizontalOptions="Center"
                   BackgroundColor="White"
@@ -56,6 +56,17 @@
                                VerticalOptions="Center"
                                HorizontalOptions="Center"
                                Color="White"/>
+        </Grid>
+
+        <!-- Reconnect Screen Overlay -->
+        <Grid x:Name="ReconnectOverlay"
+              BackgroundColor="Black"
+              Opacity="0.95"
+              IsVisible="False">
+            <Button Text="Reconnect"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Clicked="OnReconnectButtonClicked"/>
         </Grid>
     </Grid>
 </ContentPage>

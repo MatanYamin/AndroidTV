@@ -4,6 +4,7 @@
              x:Class="RemoteForAndroidTV.MainRemote">
 
     <StackLayout>
+        <Button x:Name="ReconnectButton" Text="ReConnect" Clicked="OnReconnect" IsVisible="False" />
          <Button Text="Channel Up" Clicked="OnBTN1" />
          <Button Text="1" Clicked="OnBTN2" />
           <Button Text="Switch" Clicked="SwitchDevice" />

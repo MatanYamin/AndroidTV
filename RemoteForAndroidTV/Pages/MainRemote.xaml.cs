@@ -24,6 +24,8 @@ public partial class MainRemote : ContentPage{
 
         OnVolumeChanged(remoteStateInfo.VolumeLevel);
         OnIsOnChanged(remoteStateInfo.IsOn);
+
+        ReconnectButton.IsVisible = false;
     }
 
     private void OnBTN1(object sender, EventArgs e)
@@ -93,6 +95,17 @@ public partial class MainRemote : ContentPage{
 
         RemoteConnection.VolumeChangedEvent -= OnVolumeChanged;
         RemoteConnection.IsOnChangedEvent -= OnIsOnChanged;
+    }
+
+    public async void ConnectionFailedShowReConnectButton(){
+        ReconnectButton.IsVisible = true;
+        // await Navigation.PopAsync();
+    }
+
+    public async void OnReconnect(object sender, EventArgs e){
+
+        await Navigation.PopAsync();
+
     }
 
 }

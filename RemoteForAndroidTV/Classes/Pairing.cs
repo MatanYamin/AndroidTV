@@ -43,8 +43,7 @@ public class Pairing
         }
         catch (Exception)
         {
-            CloseConnection();
-            NotifyConnectionLost();
+            ConnectionFailed();
         }
     }
 
@@ -175,45 +174,48 @@ public class Pairing
             // Send the first set of messages
             await SendServerMessage(Values.Pairing.FirstPayloadMessage);
             serverResponse = await ReadServerMessages(sslStream);
-            VerifyResult(serverResponse);
+            // VerifyResult(serverResponse);
 
             // Send the next set of messages based on the server response
             await SendServerMessage(Values.Pairing.SecondPayloadMessage);
             serverResponse = await ReadServerMessages(sslStream);
-            VerifyResult(serverResponse);
+            // VerifyResult(serverResponse);
 
             // Send the last set of messages
             await SendServerMessage(Values.Pairing.ThirdPayloadMessage);
             serverResponse = await ReadServerMessages(sslStream);
-            VerifyResult(serverResponse);
+            // VerifyResult(serverResponse);
          
         }
-        catch (OperationCanceledException)
-        {
-            Console.WriteLine("Read operation was canceled.");
+        catch(Exception){
+            ConnectionFailed();
         }
-        catch (IOException ex)
-        {
-            Console.WriteLine("Disconnected from the server: " + ex.Message);
-        }
-        catch (Exception ex)
-        {
-            // Ignore OperationCanceledException to prevent the message "The operation was canceled"
-            if (ex is OperationCanceledException)
-            {
-                Console.WriteLine("Read operation was canceled.");
-            }
-            else
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+        // catch (OperationCanceledException)
+        // {
+        //     Console.WriteLine("Read operation was canceled.");
+        // }
+        // catch (IOException ex)
+        // {
+        //     Console.WriteLine("Disconnected from the server: " + ex.Message);
+        // }
+        // catch (Exception ex)
+        // {
+        //     // Ignore OperationCanceledException to prevent the message "The operation was canceled"
+        //     if (ex is OperationCanceledException)
+        //     {
+        //         Console.WriteLine("Read operation was canceled.");
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine($"An error occurred: {ex.Message}");
 
-                // Check if there's an inner exception
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                }
-            }
-        }
+        //         // Check if there's an inner exception
+        //         if (ex.InnerException != null)
+        //         {
+        //             Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+        //         }
+        //     }
+        // }
     }
 
     private async Task SendServerMessage(byte[] message)
@@ -233,7 +235,7 @@ public class Pairing
         }
         catch (Exception ex)
         {
-            CloseConnection();
+            ConnectionFailed();
             Console.WriteLine($"Exception in SendServerMessage: {ex.Message}");
         }
     }
@@ -255,9 +257,8 @@ public class Pairing
 
             await SendServerMessage(concatenatedArray);
             byte[]? serverResponse = await ReadServerMessages(sslStream);
-            VerifyResult(serverResponse);
 
-            CloseConnection();
+            CloseConnection(); // only close because it was successfull
 
             return true;
 
@@ -340,7 +341,7 @@ public class Pairing
             }
 
             else{
-                NotifyConnectionLost();
+                ConnectionFailed();
                 return null;
             }
 
@@ -357,24 +358,10 @@ public class Pairing
             return secondMessage;
     }
 
-     private void NotifyConnectionLost()
+     private void ConnectionFailed()
     {
         CloseConnection();
         _pairinghandler.ConnectionFailed();
     }
 
-    // private static void NotifyConnectionSuccess()
-    // {
-    //     ConnectionSuccessEvent?.Invoke(null, EventArgs.Empty);
-    // }
-
-    
-        private void VerifyResult(byte[]? response)
-        {
-            if (response == null){
-                NotifyConnectionLost();
-                throw new ArgumentNullException(nameof(response));
-            }
-
-        }
 }

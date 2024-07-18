@@ -97,13 +97,17 @@ public class HandleDiscoveryDevices{
         string lastRemoteName = SharedPref.GetLastRemoteName();
 
         // If Exists than move to the connection part
-        if (!string.IsNullOrEmpty(lastRemoteIp))
+        if (!string.IsNullOrEmpty(lastRemoteIp) && IsConnectedBefore(lastRemoteIp))
         {
             var info = new DeviceInfo { Name = lastRemoteName, IpAddress = lastRemoteIp };
             MoveToConnectionPage(info);
             return;
         }
 
+    }
+
+    private bool IsConnectedBefore(string ip){
+        return SharedPref.DidConnectedWithIP(ip);
     }
 
     private async void MoveToConnectionPage(DeviceInfo info){
@@ -130,7 +134,7 @@ public class HandleDiscoveryDevices{
     void HandleExistingIP(DeviceInfo item){
 
 
-        var exist = SharedPref.DidConnectedWithIP(item.IpAddress);
+        var exist = SharedPref.HasNickName(item.IpAddress);
 
         if(!exist){return;}
 

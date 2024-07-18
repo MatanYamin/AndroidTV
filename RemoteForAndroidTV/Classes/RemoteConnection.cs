@@ -73,14 +73,17 @@ public class RemoteConnection
             await _sslStream.AuthenticateAsClientAsync(SERVER_IP, new X509Certificate2Collection(clientCertificate), false);
 
             // We should get a reponse from the server
-            await ReadServerMessage();
+            bool answer = await ReadServerMessage();
+            if(!answer){return;}
 
             // Sending the config message
             byte[] configMess = buildConfigMess();
-            bool answer = await SendServerMessage(configMess);
+            answer = await SendServerMessage(configMess);
             if(!answer){return;}
+
             // We should get a reponse from the server
-            await ReadServerMessage();
+            answer = await ReadServerMessage();
+            if(!answer){return;}
 
             // Sending last payload
             answer = await SendServerMessage(Values.RemoteConnect.SecondPayload);
@@ -90,7 +93,8 @@ public class RemoteConnection
             // The server should send 3 messages
             for (int i = 0; i < 3; i++)
             {
-                await ReadServerMessage();
+                answer = await ReadServerMessage();
+                if(!answer){return;}
             }
 
             _ = StartListeningForPings();
@@ -98,21 +102,24 @@ public class RemoteConnection
             NotifyConnectionSuccess();
 
         }
-        catch (SocketException ex)
-        {
-            Console.WriteLine($"SocketException in ConnectToDevice: {ex.Message}");
-            NotifyConnectionLost(true);
+        catch(Exception){
+            ConnectionFailed(true, null);
         }
-        catch (IOException ex)
-        {
-            Console.WriteLine($"IOException in ConnectToDevice: {ex.Message}");
-            NotifyConnectionLost(true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Exception in ConnectToDevice: {ex.Message}");
-            NotifyConnectionLost(true);
-        }
+        // catch (SocketException ex)
+        // {
+        //     Console.WriteLine($"SocketException in ConnectToDevice: {ex.Message}");
+        //     NotifyConnectionLost(true);
+        // }
+        // catch (IOException ex)
+        // {
+        //     Console.WriteLine($"IOException in ConnectToDevice: {ex.Message}");
+        //     NotifyConnectionLost(true);
+        // }
+        // catch (Exception ex)
+        // {
+        //     Console.WriteLine($"Exception in ConnectToDevice: {ex.Message}");
+        //     NotifyConnectionLost(true);
+        // }
       
     }
 
@@ -122,9 +129,9 @@ public class RemoteConnection
         Console.WriteLine(result);
     }
 
-    private async Task<byte[]?> ReadServerMessage()
+    private async Task<bool> ReadServerMessage()
     {
-        if(!PLATFORM_VALUES.IsConnectedToInternet()){return null;}
+        if(!PLATFORM_VALUES.IsConnectedToInternet()){return false;}
 
         try
         {
@@ -137,18 +144,18 @@ public class RemoteConnection
             {
                 HandleRemoteStateChangeServer(buffer2);
                 // PrintBuffer(buffer);
-                return buffer;
+                return true;
             }
             else
             {
-                NotifyConnectionLost();
-                return null;
+                ConnectionFailed(true, null);
+                return false;
             }
         }
         catch (Exception)
         {
-            NotifyConnectionLost();
-            return null;
+            ConnectionFailed(true, null);
+            return false;
         }
     }
 
@@ -167,15 +174,16 @@ public class RemoteConnection
 
             return true;
         }
-        catch (Exception ex)
+
+        catch (Exception)
         {
-            NotifyConnectionLost();
+            ConnectionFailed(true, null);
 
             return false;
         }
     }
 
-    public async void SendRemoteButton(byte[] command)
+    public void SendRemoteButton(byte[] command)
     {
         if(!PLATFORM_VALUES.IsConnectedToInternet()){return;}
         
@@ -193,15 +201,9 @@ public class RemoteConnection
 
 
             }
-            catch (IOException ex)
-            {
-                Console.WriteLine($"IOException in SendRemoteButton: {ex.Message}");
-                KillAndReConnect(command);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception in SendRemoteButton: {ex.Message}");
-                KillAndReConnect(command);
+            catch(Exception){
+                Console.WriteLine("Error in send button message");
+                ConnectionFailed(true, command);
             }
         });
     }
@@ -248,6 +250,7 @@ public class RemoteConnection
             Console.WriteLine("ListenForPings task is completing.");
         }
     }
+
     private async Task WaitForPings(SslStream sslStream, CancellationToken cancellationToken)
     {
         byte[] sizeOfMEssageBuffer = new byte[1];
@@ -283,45 +286,77 @@ public class RemoteConnection
                 {
 
                     HandleRemoteStateChangeServer(messageFromServer);
-                    // Handle other types of messages
-                    // Console.WriteLine($"Received non-PING message: {Encoding.UTF8.GetString(buffer, 0, bytesRead)}");
                 }
             }
             else
             {
                 // Treat zero bytes read as a connection close
                 Console.WriteLine("Zero bytes read from the server, connection closed.");
+                ConnectionFailed();
                 throw new IOException("Connection closed by the server.");
             }
         }
-        catch (OperationCanceledException)
-        {
-            Console.WriteLine("WaitForPings operation was canceled.");
-            throw;
+        catch(Exception){
+            ConnectionFailed();
         }
-        catch (IOException ex)
-        {
-            Console.WriteLine($"IOException in WaitForPings: {ex.Message}");
-            throw; // Re-throw the exception to handle it in ListenForPings
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Exception in WaitForPings: {ex.Message}");
-            throw;
-        }
+        // catch (OperationCanceledException)
+        // {
+        //     Console.WriteLine("WaitForPings operation was canceled.");
+        //     throw;
+        // }
+        // catch (IOException ex)
+        // {
+        //     Console.WriteLine($"IOException in WaitForPings: {ex.Message}");
+        //     throw; // Re-throw the exception to handle it in ListenForPings
+        // }
+        // catch (Exception ex)
+        // {
+        //     Console.WriteLine($"Exception in WaitForPings: {ex.Message}");
+        //     throw;
+        // }
     }
 
-    public void NotifyConnectionLost(bool reconnect = false)
+    public void ConnectionFailed(bool reconnect = false, byte[]? command = null)
     {
-        CloseConnectionAsync();
-        _connectHandler.ConnectionFailed(reconnect);
+        CloseConnection();
+
+        // If we want to reconnect:
+        if(reconnect && attempsForRecconecting++ < Values.RemoteConnect._maxAttempsToConnect){
+            Console.WriteLine("doing reconnect for the " + attempsForRecconecting + " times");
+            ReConnect(command);
+            return;
+        }
+
+        attempsForRecconecting = 0;
+        Console.WriteLine("finally connection end rom the remote");
+        _connectHandler.ConnectionClosed();
+        
+    }
+
+    private async void ReConnect(byte[]? command = null){
+
+        Dispose();
+
+        await ConnectToDevice();
+
+        // If the connection lost while trying to press a button
+        if(command != null){
+            SendRemoteButton(command);
+        }
+
     }
 
     private void NotifyConnectionSuccess()
     {
+
         var remoteState = GetRemoteCurrentState();
 
+
         _connectHandler.ConnectionSuccess(remoteState);
+
+       
+
+
     }
 
     private RemoteState GetRemoteCurrentState(){
@@ -335,7 +370,7 @@ public class RemoteConnection
         return remoteState;
     }
 
-    private void CloseConnectionAsync()
+    private void CloseConnection()
     {
         try
         {
@@ -506,7 +541,7 @@ public class RemoteConnection
             return;
         if (disposing)
         {
-            CloseConnectionAsync(); // Ensure async cleanup is complete
+            CloseConnection(); // Ensure async cleanup is complete
         }
         _disposed = true;
     }
@@ -516,19 +551,6 @@ public class RemoteConnection
         Dispose(false);
     }
 
-    // This closes the connection and reconnect
-    async void KillAndReConnect(byte[]? command = null){
-        bool reconnect = true;
-
-        if(++attempsForRecconecting > Values.RemoteConnect._maxAttempsToConnect){
-            attempsForRecconecting = 0;
-            reconnect = false;
-        }
-       await _connectHandler.ReinitializeConnectionAsync(reconnect, command);
-    }
-
-
-  
 
     void HandleRemoteStateChangeServer(byte[] stateBuffer){
 

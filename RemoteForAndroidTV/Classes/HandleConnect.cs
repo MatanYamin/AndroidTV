@@ -23,13 +23,7 @@ public class HandleConnect{
 
     }
 
-    async public void ConnectionFailed(bool reconnect = false){
-
-        // if we want to reconnect and the numbers of reconnections is allowed then try.
-        // if(reconnect && ++_reconnectAttemps <= Values.RemoteConnect._maxAttempsToConnect){
-        //     await ReinitializeConnectionAsync(true, null);
-        //     return;
-        // }
+    public void ConnectionClosed(){
 
         // we dont want to reconnect, notify the page that connection failed.
         _reconnectAttemps = 0;
@@ -40,28 +34,5 @@ public class HandleConnect{
         _pairAndConnectHandler.ConnectionSuccess(_remoteConnect, remoteState);
     }
 
-    public async Task ReinitializeConnectionAsync(bool reConnect = true, byte[]? command = null)
-    {
-        // return;
-        // Ensure the current connection is properly closed and disposed
-        if (_remoteConnect != null)
-        {
-            _remoteConnect.Dispose();
-        }
-
-        if(!reConnect){
-            _remoteConnect?.NotifyConnectionLost();
-            return;
-        }
-
-        // Create a new instance and initialize it
-        _remoteConnect = new RemoteConnection(this.ip, this);
-
-        await _remoteConnect.ConnectToDevice();
-
-        if(command != null){
-            _remoteConnect.SendRemoteButton(command);
-        }
-    }
 
 }

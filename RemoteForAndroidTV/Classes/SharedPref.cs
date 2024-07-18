@@ -37,9 +37,12 @@ public static class SharedPref
 
     public static void SaveNickname(string ip, string nickname)
     {
+        if(string.IsNullOrEmpty(nickname)){
+            return;
+        }
         // Load existing data
         string json = Preferences.Get(ip, string.Empty);
-        IpInfo ipInfo;
+        IpInfo? ipInfo;
 
         // Check if existing data is in JSON format
         if (IsValidJson(json))
@@ -57,31 +60,6 @@ public static class SharedPref
         // Save updated data
         json = JsonSerializer.Serialize(ipInfo);
         Preferences.Set(ip, json);
-    }
-
-    public static void test(string ip){
-
-        // Load existing data
-        string json = Preferences.Get(ip, string.Empty);
-        IpInfo ipInfo;
-
-        // Check if existing data is in JSON format
-        if (IsValidJson(json))
-        {
-            ipInfo = JsonSerializer.Deserialize<IpInfo>(json);
-        }
-        else
-        {
-            ipInfo = new IpInfo();
-        }
-
-        // Update nickname
-        ipInfo.DidConnect = false;
-
-        // Save updated data
-        json = JsonSerializer.Serialize(ipInfo);
-        Preferences.Set(ip, json);
-
     }
 
     private static IpInfo? GetIpInfo(string ip)
@@ -127,6 +105,33 @@ public static class SharedPref
         Preferences.Remove(key);
     }
 
+    public static void RemoveDidConnect(string ip){
+        // Load existing data
+        string json = Preferences.Get(ip, string.Empty);
+        IpInfo ipInfo;
+
+        // Check if existing data is in JSON format
+        if (IsValidJson(json))
+        {
+            ipInfo = JsonSerializer.Deserialize<IpInfo>(json);
+        }
+        else
+        {
+            ipInfo = new IpInfo();
+        }
+
+        // Update nickname
+        ipInfo.DidConnect = false;
+
+        // Save updated data
+        json = JsonSerializer.Serialize(ipInfo);
+        Preferences.Set(ip, json);
+    }
+
+    public static void RemoveLastRemote(){
+        Preferences.Remove(LAST_REMOTE_NAME);
+    }
+
     private static void SaveLastRemoteIP(string ip){
         Preferences.Set(LAST_REMOTE_IP, ip);
     }
@@ -141,8 +146,6 @@ public static class SharedPref
     }
 
     public static void ConnectedSuccess(string ip, string name){
-
-        
 
         SaveLastRemoteIP(ip);
         SaveLastRemoteName(name);
@@ -195,6 +198,19 @@ public static class SharedPref
         var info = GetIpInfo(ip);
         if(info == null){return false;}
         return info.DidConnect;
+    }
+
+    public static bool HasNickName(string ip){
+
+        var info = GetIpInfo(ip);
+        if(info == null){
+            return false;
+        }
+        if(info.Nickname == null){
+            return false;
+        }
+        Console.WriteLine("nick name: " + info.Nickname);
+        return true;
     }
 
     private static bool IsValidJson(string strInput)

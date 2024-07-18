@@ -6,10 +6,12 @@ namespace RemoteForAndroidTV
       
     public partial class PairAndConnect : ContentPage
     {
-        HandlePairing? _pairingHandler;
-        HandleConnect? _connectHandler;
-        RemoteButtons? _remoteButtons;
+        HandlePairing? _pairingHandler = null;
+        HandleConnect? _connectHandler = null;
+        RemoteButtons? _remoteButtons = null;
+        MainRemote? _mainRemote = null;
         public DeviceInfo? _device;
+        bool alreadyConnected = false;
 
         public PairAndConnect(DeviceInfo deviceInfo)
         {
@@ -22,20 +24,24 @@ namespace RemoteForAndroidTV
         }
 
         void Init(DeviceInfo deviceInfo){
+
             this._device = deviceInfo;
+
+            alreadyConnected = false;
+
+            RemoveLastRemote();
+
+            HideReconnectOverlay();
 
             // if there was a pairing process before
             if(_pairingHandler != null){
                 _pairingHandler.CloseConnectino();
             }
-        }
 
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            // Device.BeginInvokeOnMainThread(() => {
-            //     SingleEntry.Focus();
-            // });
+            // has nickname
+            if(SharedPref.HasNickName(this._device.IpAddress)){
+                ShowHideNickNamePopUp(false);
+            }
         }
 
         private void OnEntryTextChanged(object sender, TextChangedEventArgs e)
@@ -62,46 +68,74 @@ namespace RemoteForAndroidTV
 
         public async void ConnectionSuccess(RemoteConnection remote, RemoteState remoteState){
 
-            Console.WriteLine("CONNECTION YES!!");
             HideLoading();
             SaveLastRemote();
+            SingleEntry.Text = string.Empty;
 
-            // create new instance of a remote buttons with the connection we just made
+            // if(alreadyConnected){return;}
+            // alreadyConnected = true;
+
             _remoteButtons = new RemoteButtons(remote);
+            _mainRemote = new MainRemote(_remoteButtons, remoteState);
 
-            await MainThread.InvokeOnMainThreadAsync(async () =>
-            {
-                await Navigation.PushAsync(new MainRemote(_remoteButtons, remoteState));
-            });
+            if(!SharedPref.HasNickName(this._device.IpAddress)){
+                ShowHideNickNamePopUp(true);
+                return;
+                // The moving to the remote page will be after setting nickname
+            }
+
+            else{
+                MoveToMainRemote();
+            }
+            
         }
 
-        public async void ConnectionFailed()
+        private async void MoveToMainRemote(){
+
+            Console.WriteLine("moving to main remote");
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    await Navigation.PushAsync(_mainRemote);
+                });
+
+        }
+
+        private void ShowHideNickNamePopUp(bool show){
+            PopupOverlay.IsVisible = show;
+        }
+
+        public void ConnectionFailed()
         {
+            Console.WriteLine("CONNEDTED FAILEDDDD");
+
             HideLoading();
 
-            RemoveKeyFromSave();
+            // RemoveDidConnect();
+            RemoveLastRemote();
+
+            ShowReconnectOverlay();
+            // _mainRemote.ConnectionFailedShowReConnectButton();
+            // await Navigation.PopAsync();
 
             // Ensure navigation happens on the main thread
-            await MainThread.InvokeOnMainThreadAsync( () =>
-            {
-                Navigation.PopToRootAsync();
-            });
-        }
-
-        void test(){
-
-            SharedPref.test(this._device.IpAddress);
-
+            // await MainThread.InvokeOnMainThreadAsync( () =>
+            // {
+            //     Navigation.PopToRootAsync();
+            // });
         }
 
         void SaveLastRemote(){
             SharedPref.ConnectedSuccess(this._device.IpAddress, this._device.Name);
         }
 
-        public void RemoveKeyFromSave(){
-            Console.WriteLine("Remove");
-            test();
-            SharedPref.RemoveKey(this._device.IpAddress);
+        public void RemoveDidConnect(){
+            SharedPref.RemoveDidConnect(this._device.IpAddress);
+        }
+
+        private void RemoveLastRemote(){
+
+            SharedPref.RemoveLastRemote();
+
         }
 
         private void StartPairing(){
@@ -117,7 +151,6 @@ namespace RemoteForAndroidTV
 
             bool didConnect = DidConnectedBefore(this._device.IpAddress);
 
-            Console.WriteLine("connected: " + didConnect);
             if(!didConnect){
                 // This is the proccess from scratch
                 StartPairing();
@@ -136,12 +169,15 @@ namespace RemoteForAndroidTV
 
         private void OnPopupOkClicked(object sender, EventArgs e)
         {
-            string input = PopupEntry.Text;
-            DisplayAlert("Input", $"You entered: {input}", "OK");
-            PopupOverlay.IsVisible = false;
+            string nickName = PopupEntry.Text;
+            
+            ShowHideNickNamePopUp(false);
 
-            SharedPref.SaveNickname(this._device.IpAddress, input);
-            ChangeNicknameInList(input);
+            SharedPref.SaveNickname(this._device.IpAddress, nickName);
+
+            ChangeNicknameInList(nickName);
+
+            MoveToMainRemote();
 
         }
 
@@ -152,12 +188,31 @@ namespace RemoteForAndroidTV
         private void ShowLoading()
         {
             LoadingOverlay.IsVisible = true;
-
         }
 
         private void HideLoading()
         {
             LoadingOverlay.IsVisible = false;
+        }
+
+        private void OnReconnectButtonClicked(object sender, EventArgs e)
+        {
+            HideReconnectOverlay();
+            StartPairing();
+            // Add any additional logic for reconnecting here
+        }
+
+        public void ShowReconnectOverlay()
+        {
+            alreadyConnected = false;
+            SingleEntry.Text = string.Empty;
+            ReconnectOverlay.IsVisible = true;
+        }
+
+        public void HideReconnectOverlay()
+        {
+            SingleEntry.Text = string.Empty;
+            ReconnectOverlay.IsVisible = false;
         }
 
     }

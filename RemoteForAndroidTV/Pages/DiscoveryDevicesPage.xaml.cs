@@ -15,12 +15,12 @@ namespace RemoteForAndroidTV
         {
 
             InitializeComponent();
-
+testLang();
+            // Handle discovery
             _handleDiscovery = new HandleDiscoveryDevices(this);
 
         }
         
-
         public void AssingUIDevices(ObservableCollection<DeviceInfo> devices){
             DevicesListView.ItemsSource = devices;
         }

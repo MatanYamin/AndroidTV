@@ -23,7 +23,7 @@
                                IsVisible="True"
                                WidthRequest="50"
                                HeightRequest="50"
-                               Color="Green"
+                               Color="Red"
                                VerticalOptions="Center"
                                HorizontalOptions="Center"/>
         </Grid>

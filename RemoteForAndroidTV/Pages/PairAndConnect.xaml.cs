@@ -11,7 +11,6 @@ namespace RemoteForAndroidTV
         RemoteButtons? _remoteButtons = null;
         MainRemote? _mainRemote = null;
         public DeviceInfo? _device;
-        bool alreadyConnected = false;
 
         public PairAndConnect(DeviceInfo deviceInfo)
         {
@@ -26,8 +25,6 @@ namespace RemoteForAndroidTV
         void Init(DeviceInfo deviceInfo){
 
             this._device = deviceInfo;
-
-            alreadyConnected = false;
 
             RemoveLastRemote();
 
@@ -214,7 +211,6 @@ namespace RemoteForAndroidTV
 
         public void ShowReconnectOverlay()
         {
-            alreadyConnected = false;
             SingleEntry.Text = string.Empty;
             ReconnectOverlay.IsVisible = true;
         }

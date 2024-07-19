@@ -13,6 +13,7 @@ namespace RemoteForAndroidTV
             _ = new AppInitializer();
 
             MainPage = new AppShell();
+
         }
   
         protected override void OnStart()

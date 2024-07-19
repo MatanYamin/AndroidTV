@@ -143,5 +143,12 @@ public class HandleDiscoveryDevices{
             item.Name = nickName;
         }
     }
+
+    public void HandleOnAppearing(){
+
+        if (Devices.Count > 0){return;}
+            SearchDevices();
+
+    }
     
 }

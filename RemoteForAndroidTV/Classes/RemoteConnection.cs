@@ -19,13 +19,14 @@ public class RemoteConnection
 {
     int attempsForRecconecting;
     const int SEND_COMMANDS_PORT = 6466;
-    private bool _disposed, _isSendingPong, _isProcessingQueue, hasSubscribedToForegroundEvent;
+    private bool _disposed, _isSendingPong, _isProcessingQueue;
     private readonly ConcurrentQueue<Func<Task>> _operationQueue = new ConcurrentQueue<Func<Task>>();
     private readonly object _queueLock = new();
     private static IValues PLATFORM_VALUES = default!;
     private static SslStream? _sslStream = default!;
     private static TcpClient? _client = default!;
     private readonly string SERVER_IP;
+    private CancellationTokenSource _pingCancellationTokenSource = default!;
     private CancellationTokenSource _cancellationTokenSource = default!;
     private Task? _listeningTask = null;
     HandleConnect _connectHandler;
@@ -91,10 +92,11 @@ public class RemoteConnection
                 if(!answer) { return; }
             }
 
-            _ = StartListeningForPings(cancellationToken);
+            _ = StartListeningForPings();
 
             NotifyConnectionSuccess();
         }
+
         catch (OperationCanceledException)
         {
             Console.WriteLine("Operation was canceled.");
@@ -145,8 +147,6 @@ private async Task<bool> ReadServerMessage(CancellationToken cancellationToken)
         return false;
     }
 }
-
-
 
  private async Task<bool> SendServerMessage(byte[] message, CancellationToken cancellationToken)
 {
@@ -207,42 +207,43 @@ private async Task<bool> ReadServerMessage(CancellationToken cancellationToken)
         StartQueueProcessor();
     }
 
-    private Task StartListeningForPings(CancellationToken cancellationToken)
-{
-    _listeningTask = ListenForPings(cancellationToken);
-    return _listeningTask;
-}
+    private Task StartListeningForPings()
+    {
+        _pingCancellationTokenSource = new CancellationTokenSource();
+        _listeningTask = ListenForPings(_pingCancellationTokenSource.Token);
 
+        return _listeningTask;
+    }
 
     private async Task ListenForPings(CancellationToken cancellationToken)
-{
-    try
     {
-        while (!cancellationToken.IsCancellationRequested && PLATFORM_VALUES.IsConnectedToInternet())
+        try
         {
-            await WaitForPings(_sslStream, cancellationToken);
-            // Add a small delay to prevent a tight loop
-            await Task.Delay(100, cancellationToken);
+            while (!cancellationToken.IsCancellationRequested && PLATFORM_VALUES.IsConnectedToInternet())
+            {
+                await WaitForPings(_sslStream, cancellationToken);
+                // Add a small delay to prevent a tight loop
+                await Task.Delay(100, cancellationToken);
+            }
+        }
+
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Listening for pings was canceled.");
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine($"IOException in ListenForPings: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception in ListenForPings: {ex.Message}");
+        }
+        finally
+        {
+            Console.WriteLine("ListenForPings task is completing.");
         }
     }
-    catch (OperationCanceledException)
-    {
-        Console.WriteLine("Listening for pings was canceled.");
-    }
-    catch (IOException ex)
-    {
-        Console.WriteLine($"IOException in ListenForPings: {ex.Message}");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Exception in ListenForPings: {ex.Message}");
-    }
-    finally
-    {
-        Console.WriteLine("ListenForPings task is completing.");
-    }
-}
-
 
     private async Task WaitForPings(SslStream sslStream, CancellationToken cancellationToken)
 {
@@ -303,10 +304,11 @@ private async Task<bool> ReadServerMessage(CancellationToken cancellationToken)
 
         // check if connection still active
         // if not, connect again
-        bool answer = await SendServerMessage(Values.RemoteConnect.Pong, _cancellationTokenSource.Token);
+        bool answer = await SendServerMessage(Values.RemoteConnect.Pong, _pingCancellationTokenSource.Token);
 
         // connection still exists.
         if(answer){return;}
+        Console.WriteLine("reconnect");
         ConnectionFailed(true, null);
 
     }
@@ -365,8 +367,8 @@ private async Task<bool> ReadServerMessage(CancellationToken cancellationToken)
     {
         try
         {
-
             _cancellationTokenSource?.Cancel();
+            _pingCancellationTokenSource?.Cancel();
 
             _sslStream?.Close();
             _sslStream?.Dispose();
@@ -375,7 +377,6 @@ private async Task<bool> ReadServerMessage(CancellationToken cancellationToken)
             _client?.Close();
             _client?.Dispose();
             _client = null;
-
 
         }
         catch (Exception ex)

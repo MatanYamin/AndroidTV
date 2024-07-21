@@ -28,7 +28,7 @@
         <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
             <Button Text="BACK TO MAIN" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnBackToMain"/>
 
-            <Entry Style="{StaticResource LineEntryStyle}" x:Name="SingleEntry" Placeholder="Enter text" TextChanged="OnEntryTextChanged" />
+            <local:CustomCapsEntry Style="{StaticResource LineEntryStyle}" x:Name="SingleEntry" Placeholder="Enter text" TextChanged="OnEntryTextChanged" />
             <Button Text="OK" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnOkButtonClicked"/>
         </StackLayout>
 

@@ -1,7 +1,4 @@
 namespace RemoteForAndroidTV;
-using SystemConfiguration;
-using CoreFoundation;
-using System.Net;
 using Foundation;
 using UIKit;
 

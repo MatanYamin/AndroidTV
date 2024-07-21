@@ -3187,14 +3187,14 @@ target triple = "aarch64-unknown-linux-android21"
 @.env.4 = private unnamed_addr constant [15 x i8] c"MONO_LOG_LEVEL\00", align 1
 @.env.5 = private unnamed_addr constant [5 x i8] c"info\00", align 1
 @.env.6 = private unnamed_addr constant [17 x i8] c"XAMARIN_BUILD_ID\00", align 1
-@.env.7 = private unnamed_addr constant [37 x i8] c"d2e8db74-49e8-46f9-931e-52e4e3ea4334\00", align 1
+@.env.7 = private unnamed_addr constant [37 x i8] c"e74ee47e-a078-424c-86a8-abb2c4328b73\00", align 1
 @.env.8 = private unnamed_addr constant [28 x i8] c"XA_HTTP_CLIENT_HANDLER_TYPE\00", align 1
 @.env.9 = private unnamed_addr constant [42 x i8] c"Xamarin.Android.Net.AndroidMessageHandler\00", align 1
 @.env.10 = private unnamed_addr constant [29 x i8] c"__XA_PACKAGE_NAMING_POLICY__\00", align 1
 @.env.11 = private unnamed_addr constant [15 x i8] c"LowercaseCrc64\00", align 1
 
 ;ApplicationConfig
-@.ApplicationConfig.0_android_package_name = private unnamed_addr constant [35 x i8] c"com.companyname.remoteforandroidtv\00", align 1
+@.ApplicationConfig.0_android_package_name = private unnamed_addr constant [30 x i8] c"com.myapps.remoteforandroidtv\00", align 1
 
 ;DSOCacheEntry
 @.DSOCacheEntry.0_name = private unnamed_addr constant [35 x i8] c"libSystem.IO.Compression.Native.so\00", align 1

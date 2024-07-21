@@ -1,5 +1,6 @@
 using RemoteForAndroidTV;
-
+using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Hosting;
 public class AppInitializer{
 
     private bool _alertDisplayed;
@@ -50,9 +51,10 @@ public class AppInitializer{
         }
     }
 
-     public void SaveAppEntrance(){
-            // We want to know the number of times the user entered the app.
-            SharedPref.EnteringAppSaveCount();
-        }
+    public void SaveAppEntrance()
+    {
+        // We want to know the number of times the user entered the app.
+        SharedPref.EnteringAppSaveCount();
+    }
 
 }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:RemoteForAndroidTV"
+             x:Class="RemoteForAndroidTV.PairAndConnect"
+             Background="Transparent">
+    <ContentPage.Resources>
+        <Style x:Key="LineEntryStyle" TargetType="Entry">
+            <Setter Property="FontSize" Value="40" />
+            <Setter Property="TextColor" Value="#D8BFD8" /> <!-- Light purple -->
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="VerticalOptions" Value="CenterAndExpand" />
+            <Setter Property="WidthRequest" Value="200" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Gradient Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="Black" Offset="0.0" />
+                <GradientStop Color="Purple" Offset="1.0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Single Input Text Field -->
+        <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+            <Button Text="BACK TO MAIN" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnBackToMain"/>
+
+            <Entry Style="{StaticResource LineEntryStyle}" x:Name="SingleEntry" Placeholder="Enter text" TextChanged="OnEntryTextChanged" />
+            <Button Text="OK" VerticalOptions="Center" HorizontalOptions="Center" Clicked="OnOkButtonClicked"/>
+        </StackLayout>
+
+        <!-- Popup Overlay -->
+        <Grid x:Name="PopupOverlay"
+              Opacity="0.9"
+              IsVisible="False">
+            <Grid VerticalOptions="Center"
+                  HorizontalOptions="Center"
+                  BackgroundColor="White"
+                  Padding="20"
+                  WidthRequest="300"
+                  HeightRequest="200">
+                <StackLayout>
+                    <Entry x:Name="PopupEntry" Placeholder="Enter something..."/>
+                    <Button Text="OK" Clicked="OnPopupOkClicked"/>
+                </StackLayout>
+            </Grid>
+        </Grid>
+
+        <!-- Loading Screen Overlay -->
+        <Grid x:Name="LoadingOverlay"
+              BackgroundColor="Black"
+              Opacity="0.8"
+              IsVisible="False">
+            <ActivityIndicator IsRunning="True"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"
+                               Color="White"/>
+        </Grid>
+
+        <!-- Reconnect Screen Overlay -->
+        <Grid x:Name="ReconnectOverlay"
+              BackgroundColor="Black"
+              Opacity="0.95"
+              IsVisible="False">
+            <Button Text="Reconnect"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Clicked="OnReconnectButtonClicked"/>
+        </Grid>
+    </Grid>
+</ContentPage>
